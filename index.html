@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J 人 - 智能任务管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .page {
+            display: none;
+            min-height: 100vh;
+        }
+        .page.active {
+            display: block;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
+        }
+        .task-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .tag-job { background: #dbeafe; color: #1e40af; }
+        .tag-project { background: #fef3c7; color: #92400e; }
+        .tag-travel { background: #d1fae5; color: #065f46; }
+        .tag-exam { background: #fce7f3; color: #9d174d; }
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .nav-item.active {
+            color: #8b5cf6;
+        }
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .nav-label {
+            font-size: 12px;
+        }
+        .floating-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .ai-input-area {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .view-type-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+        .view-type-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .view-type-btn.active {
+            border-color: #8b5cf6;
+            background: #8b5cf6;
+            color: white;
+        }
+        .vip-badge {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .safety-warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .safety-warning.show {
+            display: block;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页 -->
+    <div id="login-page" class="page active">
+        <div class="min-h-screen flex items-center justify-center p-6">
+            <div class="card w-full max-w-sm">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-3xl">🎯</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">J 人</h1>
+                    <p class="text-gray-500 mt-2">智能任务管理助手</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">手机号</label>
+                        <input type="tel" id="phone-input" class="input-field" placeholder="请输入手机号" maxlength="11">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">验证码</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="code-input" class="input-field flex-1" placeholder="6 位验证码" maxlength="6">
+                            <button id="send-code-btn" class="px-4 py-2 border-2 border-purple-500 text-purple-500 rounded-xl font-medium hover:bg-purple-50 transition">
+                                发送
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="safety-warning" id="safety-warning">
+                        ⚠️ 检测到可能存在风险的内容，为了您的安全，无法继续操作。如有需要，请联系专业机构寻求帮助。
+                    </div>
+                    
+                    <button class="btn-primary mt-6" onclick="handleLogin()">登录</button>
+                </div>
+                
+                <p class="text-center text-xs text-gray-400 mt-6">
+                    登录即表示同意《用户协议》和《隐私政策》
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主页面 -->
+    <div id="main-page" class="page active">
+        <!-- AI 智能输入区 -->
+        <div class="p-4 pb-2">
+            <div class="ai-input-area">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center">
+                        <span class="text-white text-xl">⚡</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">AI 智能整理</h3>
+                        <p class="text-xs text-gray-500">语音/文字输入，自动分类</p>
+                    </div>
+                </div>
+                
+                <textarea id="ai-input" class="input-field mb-3" rows="3" placeholder="输入进度更新，AI 自动识别分类...&#10;例如：&#10;• 下周要去日本旅游 5 天&#10;• 开始准备公务员考试&#10;• 面试通过了字节跳动的二面"></textarea>
+                
+                <div class="flex gap-2">
+                    <button class="flex-1 btn-primary py-3" onclick="handleAIInput()">
+                        🎤 语音输入
+                    </button>
+                    <button class="flex-1 btn-primary py-3" onclick="handleAIInput()">
+                        ✨ 立即整理
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 视图类型选择 -->
+        <div class="px-4">
+            <div class="view-type-selector">
+                <button class="view-type-btn active" data-view="all">全部</button>
+                <button class="view-type-btn" data-view="timeline">时间轴</button>
+                <button class="view-type-btn" data-view="gantt">甘特图</button>
+                <button class="view-type-btn" data-view="kanban">看板</button>
+                <button class="view-type-btn" data-view="calendar">日历</button>
+            </div>
+        </div>
+
+        <!-- 任务列表 -->
+        <div id="list-view" class="px-4 pb-24">
+            <!-- 求职进度 -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-bold text-gray-800">求职进度</h2>
+                    <span class="text-sm text-gray-500">2 个进行中</span>
+                </div>
+                
+                <div class="task-card animate-slide-in" onclick="openTaskDetail('travel')">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">高级产品经理</h3>
+                            <p class="text-sm text-gray-500">字节跳动</p>
+                        </div>
+                        <span class="task-tag tag-job">面试中</span>
+                    </div>
+                    <div class="progress-bar mb-2">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500">"已通过初面，等待二面安排"</p>
+                    <div class="flex items-center justify-between mt-3">
+                        <span class="text-xs text-gray-400">更新于 2 小时前</span>
+                        <button class="text-purple-500 text-sm font-medium">更新进度</button>
+                    </div>
+                </div>
+                
+                <div class="task-card animate-slide-in">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">前端工程师</h3>
+                            <p class="text-sm text-gray-500">腾讯</p>
+                        </div>
+                        <span class="task-tag tag-job">简历筛选</span>
+                    </div>
+                    <div class="progress-bar mb-2">
+                        <div class="progress-fill" style="width: 25%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500">"已投递简历，等待 HR 联系"</p>
+                    <div class="flex items-center justify-between mt-3">
+                        <span class="text-xs text-gray-400">更新于 1 天前</span>
+                        <button class="text-purple-500 text-sm font-medium">更新进度</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目进度 -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-bold text-gray-800">项目进度</h2>
+                    <span class="text-sm text-gray-500">3 个进行中</span>
+                </div>
+                
+                <div class="task-card animate-slide-in">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">日本东京自由行</h3>
+                            <p class="text-sm text-gray-500">2026.05.15 - 2026.05.20</p>
+                        </div>
+                        <span class="task-tag tag-travel">筹备中</span>
+                    </div>
+                    <div class="progress-bar mb-2">
+                        <div class="progress-fill" style="width: 40%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500">"机票已订，酒店和行程待确认"</p>
+                    <div class="flex items-center justify-between mt-3">
+                        <span class="text-xs text-gray-400">更新于 3 小时前</span>
+                        <button class="text-purple-500 text-sm font-medium">更新进度</button>
+                    </div>
+                </div>
+                
+                <div class="task-card animate-slide-in">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">公务员考试备考</h3>
+                            <p class="text-sm text-gray-500">目标：2026 年国考</p>
+                        </div>
+                        <span class="task-tag tag-exam">学习中</span>
+                    </div>
+                    <div class="progress-bar mb-2">
+                        <div class="progress-fill" style="width: 35%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500">"行测完成 60%，申论刚开始"</p>
+                    <div class="flex items-center justify-between mt-3">
+                        <span class="text-xs text-gray-400">更新于 5 小时前</span>
+                        <button class="text-purple-500 text-sm font-medium">更新进度</button>
+                    </div>
+                </div>
+                
+                <div class="task-card animate-slide-in">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">J 人任务 App 开发</h3>
+                            <p class="text-sm text-gray-500">与 AI 搭档合作项目</p>
+                        </div>
+                        <span class="task-tag tag-project">开发中</span>
+                    </div>
+                    <div class="progress-bar mb-2">
+                        <div class="progress-fill" style="width: 15%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500">"UI 设计完成，等待代码实现"</p>
+                    <div class="flex items-center justify-between mt-3">
+                        <span class="text-xs text-gray-400">更新于 刚刚</span>
+                        <button class="text-purple-500 text-sm font-medium">更新进度</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 甘特图视图（隐藏，点击切换显示） -->
+            <div id="gantt-view" class="mb-6 hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-bold text-gray-800">甘特图视图</h2>
+                    <span class="text-sm text-gray-500">2026 年 5 月</span>
+                </div>
+                <div class="card overflow-x-auto">
+                    <div class="min-w-[600px]">
+                        <!-- 日期头 -->
+                        <div class="flex border-b pb-2 mb-4">
+                            <div class="w-32 flex-shrink-0 text-sm font-medium text-gray-600">任务</div>
+                            <div class="flex-1 grid grid-cols-31 gap-1">
+                                <!-- 31 天 -->
+                                <script>
+                                    for(let i=1; i<=31; i++) {
+                                        document.write(`<div class="text-xs text-center text-gray-400">${i}</div>`);
+                                    }
+                                </script>
+                            </div>
+                        </div>
+                        
+                        <!-- 任务条 -->
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <div class="w-32 flex-shrink-0 text-sm text-gray-800">日本旅游</div>
+                                <div class="flex-1 relative h-8">
+                                    <div class="absolute left-[28%] w-[16%] h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full opacity-80"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-32 flex-shrink-0 text-sm text-gray-800">公务员考试</div>
+                                <div class="flex-1 relative h-8">
+                                    <div class="absolute left-[0%] w-[60%] h-full bg-gradient-to-r from-pink-400 to-rose-500 rounded-full opacity-80"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-32 flex-shrink-0 text-sm text-gray-800">J 人 App 开发</div>
+                                <div class="flex-1 relative h-8">
+                                    <div class="absolute left-[10%] w-[40%] h-full bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full opacity-80"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 看板视图（隐藏，点击切换显示） -->
+            <div id="kanban-view" class="mb-6 hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-bold text-gray-800">看板视图</h2>
+                </div>
+                <div class="grid grid-cols-3 gap-4 overflow-x-auto">
+                    <!-- 待开始 -->
+                    <div class="bg-gray-50 rounded-xl p-3">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            待开始
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="bg-white rounded-lg p-3 shadow-sm">
+                                <p class="text-sm font-medium text-gray-800">腾讯前端工程师</p>
+                                <p class="text-xs text-gray-500 mt-1">简历筛选</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 进行中 -->
+                    <div class="bg-purple-50 rounded-xl p-3">
+                        <h3 class="font-semibold text-purple-700 mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-purple-500 rounded-full"></span>
+                            进行中
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="bg-white rounded-lg p-3 shadow-sm">
+                                <p class="text-sm font-medium text-gray-800">字节产品经理</p>
+                                <p class="text-xs text-gray-500 mt-1">面试中</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-3 shadow-sm">
+                                <p class="text-sm font-medium text-gray-800">日本旅游</p>
+                                <p class="text-xs text-gray-500 mt-1">筹备中</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-3 shadow-sm">
+                                <p class="text-sm font-medium text-gray-800">公务员考试</p>
+                                <p class="text-xs text-gray-500 mt-1">学习中</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 已完成 -->
+                    <div class="bg-green-50 rounded-xl p-3">
+                        <h3 class="font-semibold text-green-700 mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            已完成
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="bg-white rounded-lg p-3 shadow-sm opacity-60">
+                                <p class="text-sm font-medium text-gray-800">简历优化</p>
+                                <p class="text-xs text-gray-500 mt-1">已完成</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 日历视图（隐藏，点击切换显示） -->
+            <div id="calendar-view" class="mb-6 hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-bold text-gray-800">日历视图</h2>
+                    <span class="text-sm text-gray-500">2026 年 5 月</span>
+                </div>
+                <div class="card">
+                    <!-- 星期头 -->
+                    <div class="grid grid-cols-7 gap-1 mb-2">
+                        <div class="text-center text-sm text-red-500 font-medium">日</div>
+                        <div class="text-center text-sm text-gray-600 font-medium">一</div>
+                        <div class="text-center text-sm text-gray-600 font-medium">二</div>
+                        <div class="text-center text-sm text-gray-600 font-medium">三</div>
+                        <div class="text-center text-sm text-gray-600 font-medium">四</div>
+                        <div class="text-center text-sm text-gray-600 font-medium">五</div>
+                        <div class="text-center text-sm text-blue-500 font-medium">六</div>
+                    </div>
+                    <!-- 日历网格 -->
+                    <div class="grid grid-cols-7 gap-1">
+                        <!-- 空白 -->
+                        <div class="aspect-square bg-gray-50 rounded-lg"></div>
+                        <div class="aspect-square bg-gray-50 rounded-lg"></div>
+                        <!-- 1 号 -->
+                        <div class="aspect-square border-2 border-purple-200 rounded-lg p-1 relative">
+                            <span class="text-sm font-medium">1</span>
+                            <div class="absolute bottom-1 left-1 right-1">
+                                <div class="text-xs bg-purple-100 text-purple-700 rounded px-1 truncate">旅游</div>
+                            </div>
+                        </div>
+                        <!-- 2-31 号简化显示 -->
+                        <script>
+                            for(let i=2; i<=31; i++) {
+                                const hasEvent = [1,5,10,15,20,25].includes(i);
+                                document.write(`<div class="aspect-square border rounded-lg p-1 relative ${hasEvent ? 'border-purple-300 bg-purple-50' : 'bg-gray-50'}">
+                                    <span class="text-sm font-medium">${i}</span>
+                                    ${hasEvent ? `<div class="absolute bottom-1 left-1 right-1"><div class="text-xs bg-purple-100 text-purple-700 rounded px-1 truncate">任务</div></div>` : ''}
+                                </div>`);
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">首页</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('tasks')">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">任务</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('vip')">
+                <span class="nav-icon">👑</span>
+                <span class="nav-label">VIP</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">我的</span>
+            </div>
+        </div>
+
+        <!-- 浮动添加按钮 -->
+        <button class="floating-btn" onclick="openAddModal()">+</button>
+    </div>
+
+    <!-- VIP 页面 -->
+    <div id="vip-page" class="page">
+        <div class="p-4">
+            <div class="card text-center py-12">
+                <div class="text-6xl mb-4">👑</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">升级 VIP</h2>
+                <p class="text-gray-500 mb-6">解锁更多高级功能</p>
+                
+                <div class="space-y-4 text-left max-w-sm mx-auto">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🎨</span>
+                        <div>
+                            <h4 class="font-semibold">自定义皮肤</h4>
+                            <p class="text-sm text-gray-500">个性化主题配色</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📔</span>
+                        <div>
+                            <h4 class="font-semibold">电子手帐本</h4>
+                            <p class="text-sm text-gray-500">精美模板，记录生活</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📊</span>
+                        <div>
+                            <h4 class="font-semibold">高级统计</h4>
+                            <p class="text-sm text-gray-500">深度数据分析</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🔔</span>
+                        <div>
+                            <h4 class="font-semibold">智能提醒</h4>
+                            <p class="text-sm text-gray-500">自定义提醒规则</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-primary mt-8 py-4 text-lg">
+                    ¥19.9 永久解锁
+                </button>
+                <p class="text-xs text-gray-400 mt-4">一次性付费，终身使用</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 任务详情页（手帐风格） -->
+    <div id="task-detail-modal" class="modal">
+        <div class="modal-content max-w-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold">任务详情</h3>
+                <button onclick="closeTaskDetail()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+            </div>
+            
+            <!-- 任务封面 -->
+            <div class="task-cover mb-4">
+                <div class="h-32 bg-gradient-to-br from-purple-400 via-pink-300 to-indigo-400 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-20">
+                        <div class="absolute top-4 left-8 w-16 h-16 bg-white rounded-full"></div>
+                        <div class="absolute bottom-6 right-12 w-24 h-24 bg-yellow-300 rounded-full"></div>
+                        <div class="absolute top-12 right-8 w-12 h-12 bg-pink-200 rounded-full"></div>
+                    </div>
+                    <span class="text-6xl relative z-10">✈️</span>
+                </div>
+            </div>
+            
+            <!-- 任务标题和标签 -->
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">日本东京自由行</h2>
+                    <p class="text-sm text-gray-500">2026.05.15 - 2026.05.20</p>
+                </div>
+                <span class="task-tag tag-travel text-sm px-4 py-2">筹备中</span>
+            </div>
+            
+            <!-- 进度条 -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600">整体进度</span>
+                    <span class="text-sm font-bold text-purple-600">40%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 40%"></div>
+                </div>
+            </div>
+            
+            <!-- VIP 皮肤选择器 -->
+            <div class="mb-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold text-gray-700">🎨 手帐皮肤</span>
+                    <span class="vip-badge">VIP</span>
+                </div>
+                <div class="flex gap-2 overflow-x-auto">
+                    <button class="skin-btn active flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 via-pink-300 to-indigo-400 border-2 border-purple-600"></button>
+                    <button class="skin-btn flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 via-teal-300 to-blue-400 border-2 border-transparent"></button>
+                    <button class="skin-btn flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 via-red-300 to-pink-400 border-2 border-transparent"></button>
+                    <button class="skin-btn flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-400 via-purple-300 to-pink-400 border-2 border-transparent"></button>
+                    <button class="skin-btn flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-amber-200 via-yellow-300 to-orange-400 border-2 border-transparent"></button>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">👑 VIP 用户可解锁 20+ 精美皮肤</p>
+            </div>
+            
+            <!-- 手帐时间线 -->
+            <div class="mb-4">
+                <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <span>📝</span> 进度记录
+                </h4>
+                <div class="space-y-3 max-h-48 overflow-y-auto">
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-sm">🎫</div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-800">机票已预订</p>
+                            <p class="text-xs text-gray-500">5 月 6 日 14:30</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm">🏨</div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-800">开始筛选酒店，倾向新宿区域</p>
+                            <p class="text-xs text-gray-500">5 月 5 日 10:15</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-sm">📋</div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-800">创建旅行计划</p>
+                            <p class="text-xs text-gray-500">5 月 3 日 09:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 添加记录输入框 -->
+            <div class="mb-4">
+                <textarea id="progress-note" class="input-field" rows="2" placeholder="记录此刻的想法或进展..."></textarea>
+                <div class="flex gap-2 mt-2">
+                    <button class="flex-1 py-2 px-3 bg-purple-100 text-purple-600 rounded-xl text-sm font-medium hover:bg-purple-200 transition" onclick="addProgressNote()">
+                        📝 添加记录
+                    </button>
+                    <button class="flex-1 py-2 px-3 bg-pink-100 text-pink-600 rounded-xl text-sm font-medium hover:bg-pink-200 transition">
+                        📷 上传图片
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 任务信息 -->
+            <div class="border-t pt-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500">创建时间</p>
+                        <p class="text-sm font-medium text-gray-800">2026.05.03</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">最后更新</p>
+                        <p class="text-sm font-medium text-gray-800">2 小时前</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">提醒设置</p>
+                        <p class="text-sm font-medium text-gray-800">✅ 已开启</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">视图模式</p>
+                        <p class="text-sm font-medium text-gray-800">时间轴</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 操作按钮 -->
+            <div class="flex gap-3 mt-6">
+                <button class="flex-1 py-3 px-4 border-2 border-purple-500 text-purple-500 rounded-xl font-semibold hover:bg-purple-50 transition">
+                    编辑任务
+                </button>
+                <button class="flex-1 py-3 px-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold hover:shadow-lg transition">
+                    更新进度
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加任务弹窗 -->
+    <div id="add-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold">新建任务</h3>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">任务名称</label>
+                    <input type="text" id="task-name" class="input-field" placeholder="例如：日本旅游">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">任务类型</label>
+                    <select id="task-type" class="input-field">
+                        <option value="job">求职</option>
+                        <option value="project">项目</option>
+                        <option value="travel">旅游</option>
+                        <option value="exam">考试</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">展示方式</label>
+                    <select id="task-view" class="input-field">
+                        <option value="timeline">时间轴</option>
+                        <option value="gantt">甘特图</option>
+                        <option value="kanban">看板</option>
+                        <option value="calendar">日历</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">开始日期</label>
+                    <input type="date" id="task-start" class="input-field">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">结束日期</label>
+                    <input type="date" id="task-end" class="input-field">
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="task-reminder" class="w-4 h-4">
+                    <label for="task-reminder" class="text-sm text-gray-700">开启自动提醒</label>
+                </div>
+                
+                <button class="btn-primary mt-4" onclick="saveTask()">创建任务</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面切换
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // 底部导航切换
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            if (tab === 'home') {
+                switchPage('main-page');
+            } else if (tab === 'vip') {
+                switchPage('vip-page');
+            }
+        }
+
+        // 登录处理
+        function handleLogin() {
+            const phone = document.getElementById('phone-input').value;
+            const code = document.getElementById('code-input').value;
+            
+            if (!phone || phone.length !== 11) {
+                alert('请输入正确的手机号');
+                return;
+            }
+            
+            if (!code || code.length !== 6) {
+                alert('请输入 6 位验证码');
+                return;
+            }
+            
+            // 模拟登录成功
+            switchPage('main-page');
+        }
+
+        // 发送验证码
+        document.getElementById('send-code-btn').addEventListener('click', function() {
+            const phone = document.getElementById('phone-input').value;
+            if (!phone || phone.length !== 11) {
+                alert('请输入正确的手机号');
+                return;
+            }
+            
+            this.textContent = '已发送';
+            this.disabled = true;
+            this.classList.add('bg-purple-50');
+            
+            // 模拟发送验证码
+            setTimeout(() => {
+                alert('验证码已发送：123456（测试用）');
+            }, 1000);
+        });
+
+        // AI 输入处理
+        function handleAIInput() {
+            const input = document.getElementById('ai-input').value;
+            
+            if (!input.trim()) {
+                alert('请输入内容');
+                return;
+            }
+            
+            // 安全检查
+            const riskKeywords = ['自杀', '自残', '伤害自己', '结束生命', '轻生'];
+            const hasRisk = riskKeywords.some(keyword => input.includes(keyword));
+            
+            if (hasRisk) {
+                document.getElementById('safety-warning').classList.add('show');
+                return;
+            }
+            
+            document.getElementById('safety-warning').classList.remove('show');
+            
+            // 模拟 AI 识别和处理
+            alert('AI 正在识别任务类型...\n\n识别结果：\n• 任务类型：根据内容自动分类\n• 展示方式：智能匹配最佳视图\n• 提醒设置：已自动配置');
+            
+            document.getElementById('ai-input').value = '';
+        }
+
+        // 视图类型切换
+        document.querySelectorAll('.view-type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const view = this.dataset.view;
+                
+                // 按钮样式切换
+                document.querySelectorAll('.view-type-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 显示对应视图
+                const listView = document.querySelector('#list-view');
+                const ganttView = document.querySelector('#gantt-view');
+                const kanbanView = document.querySelector('#kanban-view');
+                const calendarView = document.querySelector('#calendar-view');
+                
+                if (listView) listView.classList.add('hidden');
+                if (ganttView) ganttView.classList.add('hidden');
+                if (kanbanView) kanbanView.classList.add('hidden');
+                if (calendarView) calendarView.classList.add('hidden');
+                
+                if (view === 'all' || view === 'timeline') {
+                    if (listView) listView.classList.remove('hidden');
+                } else if (view === 'gantt') {
+                    if (ganttView) ganttView.classList.remove('hidden');
+                } else if (view === 'kanban') {
+                    if (kanbanView) kanbanView.classList.remove('hidden');
+                } else if (view === 'calendar') {
+                    if (calendarView) calendarView.classList.remove('hidden');
+                }
+            });
+        });
+
+        // 弹窗控制
+        function openAddModal() {
+            document.getElementById('add-modal').classList.add('active');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.remove('active');
+        }
+
+        // 保存任务
+        function saveTask() {
+            const name = document.getElementById('task-name').value;
+            const type = document.getElementById('task-type').value;
+            
+            if (!name.trim()) {
+                alert('请输入任务名称');
+                return;
+            }
+            
+            alert('任务创建成功！\n\n任务名称：' + name + '\n类型：' + type);
+            closeAddModal();
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('add-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddModal();
+            }
+        });
+
+        // 任务详情页控制
+        function openTaskDetail(type) {
+            const modal = document.getElementById('task-detail-modal');
+            modal.classList.add('active');
+            
+            // 根据任务类型设置不同的封面 emoji
+            const emojis = {
+                'job': '💼',
+                'project': '🚀',
+                'travel': '✈️',
+                'exam': '📚',
+                'other': '📌'
+            };
+            const coverEmoji = document.querySelector('.task-cover .text-6xl');
+            if (coverEmoji && emojis[type]) {
+                coverEmoji.textContent = emojis[type];
+            }
+        }
+
+        function closeTaskDetail() {
+            document.getElementById('task-detail-modal').classList.remove('active');
+        }
+
+        // 添加进度记录
+        function addProgressNote() {
+            const note = document.getElementById('progress-note').value;
+            if (!note.trim()) {
+                alert('请输入记录内容');
+                return;
+            }
+            
+            const timeline = document.querySelector('.space-y-3.max-h-48');
+            const now = new Date();
+            const timeStr = `${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            const newRecord = document.createElement('div');
+            newRecord.className = 'flex gap-3 animate-slide-in';
+            newRecord.innerHTML = `
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-sm">✨</div>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm text-gray-800">${note}</p>
+                    <p class="text-xs text-gray-500">${timeStr}</p>
+                </div>
+            `;
+            
+            timeline.insertBefore(newRecord, timeline.firstChild);
+            document.getElementById('progress-note').value = '';
+        }
+
+        // 皮肤选择
+        document.querySelectorAll('.skin-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.skin-btn').forEach(b => {
+                    b.classList.remove('active', 'border-purple-600');
+                    b.classList.add('border-transparent');
+                });
+                this.classList.add('active', 'border-purple-600');
+                this.classList.remove('border-transparent');
+            });
+        });
+
+        // 点击任务详情页外部关闭
+        document.getElementById('task-detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTaskDetail();
+            }
+        });
+    </script>
+</body>
+</html>
