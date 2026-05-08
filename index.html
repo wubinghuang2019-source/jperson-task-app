@@ -18,28 +18,28 @@
                     },
                     colors: {
                         primary: {
-                            50: 'hsl(250, 76%, 97%)',
-                            100: 'hsl(250, 76%, 94%)',
-                            200: 'hsl(250, 76%, 88%)',
-                            300: 'hsl(250, 76%, 78%)',
-                            400: 'hsl(250, 76%, 65%)',
-                            500: 'hsl(250, 76%, 55%)',
-                            600: 'hsl(250, 76%, 45%)',
-                            700: 'hsl(250, 76%, 35%)',
-                            800: 'hsl(250, 76%, 25%)',
-                            900: 'hsl(250, 76%, 15%)',
+                            50: 'hsl(220, 70%, 97%)',
+                            100: 'hsl(220, 70%, 94%)',
+                            200: 'hsl(220, 70%, 88%)',
+                            300: 'hsl(220, 70%, 78%)',
+                            400: 'hsl(220, 70%, 65%)',
+                            500: 'hsl(220, 70%, 55%)',
+                            600: 'hsl(220, 70%, 45%)',
+                            700: 'hsl(220, 70%, 35%)',
+                            800: 'hsl(220, 70%, 25%)',
+                            900: 'hsl(220, 70%, 15%)',
                         },
                         accent: {
-                            50: 'hsl(280, 85%, 97%)',
-                            100: 'hsl(280, 85%, 92%)',
-                            200: 'hsl(280, 85%, 84%)',
-                            300: 'hsl(280, 85%, 72%)',
-                            400: 'hsl(280, 85%, 60%)',
-                            500: 'hsl(280, 85%, 50%)',
-                            600: 'hsl(280, 85%, 42%)',
-                            700: 'hsl(280, 85%, 34%)',
-                            800: 'hsl(280, 85%, 26%)',
-                            900: 'hsl(280, 85%, 18%)',
+                            50: 'hsl(240, 60%, 97%)',
+                            100: 'hsl(240, 60%, 92%)',
+                            200: 'hsl(240, 60%, 84%)',
+                            300: 'hsl(240, 60%, 72%)',
+                            400: 'hsl(240, 60%, 60%)',
+                            500: 'hsl(240, 60%, 50%)',
+                            600: 'hsl(240, 60%, 42%)',
+                            700: 'hsl(240, 60%, 34%)',
+                            800: 'hsl(240, 60%, 26%)',
+                            900: 'hsl(240, 60%, 18%)',
                         }
                     },
                     fontSize: {
@@ -866,6 +866,11 @@
             </div>
         </div>
 
+        <!-- VIP 页面返回按钮 -->
+        <button onclick="switchTab('home')" class="fixed top-6 left-6 z-50 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-gray-50 transition hidden" id="vip-back-btn">
+            ←
+        </button>
+
         <!-- 浮动添加按钮 -->
         <button class="floating-btn" onclick="openAddModal()">+</button>
     </div>
@@ -1125,12 +1130,24 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.currentTarget.classList.add('active');
+            if(event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
             
-            if (tab === 'home') {
-                switchPage('main-page');
-            } else if (tab === 'vip') {
+            // 显示/隐藏 VIP 返回按钮
+            const backBtn = document.getElementById('vip-back-btn');
+            if (tab === 'vip') {
+                backBtn.classList.remove('hidden');
                 switchPage('vip-page');
+            } else if (tab === 'home') {
+                backBtn.classList.add('hidden');
+                switchPage('main-page');
+            } else if (tab === 'tasks') {
+                backBtn.classList.add('hidden');
+                switchPage('main-page');
+            } else if (tab === 'profile') {
+                backBtn.classList.add('hidden');
+                alert('个人中心功能开发中~');
             }
         }
 
@@ -1191,10 +1208,70 @@
             
             document.getElementById('safety-warning').classList.remove('show');
             
-            // 模拟 AI 识别和处理
-            alert('AI 正在识别任务类型...\n\n识别结果：\n• 任务类型：根据内容自动分类\n• 展示方式：智能匹配最佳视图\n• 提醒设置：已自动配置');
+            // 简单关键词识别
+            let type = 'other';
+            let typeLabel = '其他';
+            
+            if (input.includes('面试') || input.includes('简历') || input.includes('工作') || input.includes('offer')) {
+                type = 'job';
+                typeLabel = '求职';
+            } else if (input.includes('旅游') || input.includes('旅行') || input.includes('机票') || input.includes('酒店')) {
+                type = 'travel';
+                typeLabel = '旅游';
+            } else if (input.includes('考试') || input.includes('学习') || input.includes('公务员') || input.includes('备考')) {
+                type = 'exam';
+                typeLabel = '考试';
+            } else if (input.includes('项目') || input.includes('开发') || input.includes('App') || input.includes('产品')) {
+                type = 'project';
+                typeLabel = '项目';
+            }
+            
+            // 创建任务
+            const taskCard = document.createElement('div');
+            taskCard.className = 'task-card animate-slide-in';
+            taskCard.onclick = function() { openTaskDetail(type); };
+            
+            const tagClass = {
+                'job': 'tag-job',
+                'project': 'tag-project',
+                'travel': 'tag-travel',
+                'exam': 'tag-exam',
+                'other': 'tag-project'
+            };
+            
+            const now = new Date();
+            const timeStr = `${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            taskCard.innerHTML = `
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-lg">${input.substring(0, 30)}${input.length > 30 ? '...' : ''}</h3>
+                        <p class="text-sm text-gray-500 mt-1">AI 智能识别 · ${typeLabel}</p>
+                    </div>
+                    <span class="task-tag ${tagClass[type]}">${typeLabel}</span>
+                </div>
+                <div class="progress-bar mb-3">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <p class="text-sm text-gray-600">"AI 已自动分类，开始行动吧！"</p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-xs text-gray-400">更新于 刚刚</span>
+                    <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
+                </div>
+            `;
+            
+            // 添加到列表
+            const listView = document.querySelector('#list-view');
+            const firstSection = listView.querySelector('.mb-8');
+            if (firstSection) {
+                const projectSection = firstSection.nextElementSibling;
+                if (projectSection) {
+                    projectSection.insertBefore(taskCard, projectSection.querySelector('.task-card'));
+                }
+            }
             
             document.getElementById('ai-input').value = '';
+            alert(`✅ AI 识别成功！\n\n识别类型：${typeLabel}\n任务已添加到列表`);
         }
 
         // 视图类型切换
@@ -1242,14 +1319,73 @@
         function saveTask() {
             const name = document.getElementById('task-name').value;
             const type = document.getElementById('task-type').value;
+            const view = document.getElementById('task-view').value;
+            const startDate = document.getElementById('task-start').value;
+            const endDate = document.getElementById('task-end').value;
+            const hasReminder = document.getElementById('task-reminder').checked;
             
             if (!name.trim()) {
                 alert('请输入任务名称');
                 return;
             }
             
-            alert('任务创建成功！\n\n任务名称：' + name + '\n类型：' + type);
+            // 创建任务卡片
+            const taskCard = document.createElement('div');
+            taskCard.className = 'task-card animate-slide-in';
+            taskCard.onclick = function() { openTaskDetail(type); };
+            
+            const typeLabels = {
+                'job': '求职',
+                'project': '项目',
+                'travel': '旅游',
+                'exam': '考试',
+                'other': '其他'
+            };
+            
+            const tagClass = {
+                'job': 'tag-job',
+                'project': 'tag-project',
+                'travel': 'tag-travel',
+                'exam': 'tag-exam',
+                'other': 'tag-project'
+            };
+            
+            const now = new Date();
+            const timeStr = `${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            taskCard.innerHTML = `
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-lg">${name}</h3>
+                        <p class="text-sm text-gray-500 mt-1">${startDate || '未设置日期'}</p>
+                    </div>
+                    <span class="task-tag ${tagClass[type] || 'tag-project'}">${typeLabels[type] || '其他'}</span>
+                </div>
+                <div class="progress-bar mb-3">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <p class="text-sm text-gray-600">"任务已创建，开始行动吧！"</p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-xs text-gray-400">更新于 刚刚</span>
+                    <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
+                </div>
+            `;
+            
+            // 添加到列表顶部
+            const listView = document.querySelector('#list-view');
+            const firstSection = listView.querySelector('.mb-8');
+            if (firstSection) {
+                firstSection.insertBefore(taskCard, firstSection.querySelector('.task-card'));
+            }
+            
+            alert('任务创建成功！\n\n任务名称：' + name + '\n类型：' + typeLabels[type]);
             closeAddModal();
+            
+            // 清空表单
+            document.getElementById('task-name').value = '';
+            document.getElementById('task-start').value = '';
+            document.getElementById('task-end').value = '';
+            document.getElementById('task-reminder').checked = false;
         }
 
         // 点击弹窗外部关闭
