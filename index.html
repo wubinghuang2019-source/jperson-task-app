@@ -2,1476 +2,838 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J 人 - 智能任务管理</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                        display: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: 'hsl(170, 50%, 97%)',
-                            100: 'hsl(170, 50%, 93%)',
-                            200: 'hsl(170, 50%, 86%)',
-                            300: 'hsl(170, 50%, 75%)',
-                            400: 'hsl(170, 50%, 60%)',
-                            500: 'hsl(170, 50%, 45%)',
-                            600: 'hsl(170, 50%, 36%)',
-                            700: 'hsl(170, 50%, 28%)',
-                            800: 'hsl(170, 50%, 20%)',
-                            900: 'hsl(170, 50%, 12%)',
-                        },
-                        accent: {
-                            50: 'hsl(200, 55%, 97%)',
-                            100: 'hsl(200, 55%, 93%)',
-                            200: 'hsl(200, 55%, 85%)',
-                            300: 'hsl(200, 55%, 73%)',
-                            400: 'hsl(200, 55%, 58%)',
-                            500: 'hsl(200, 55%, 45%)',
-                            600: 'hsl(200, 55%, 36%)',
-                            700: 'hsl(200, 55%, 28%)',
-                            800: 'hsl(200, 55%, 20%)',
-                            900: 'hsl(200, 55%, 14%)',
-                        }
-                    },
-                    fontSize: {
-                        'display': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-                        'h1': ['3rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
-                        'h2': ['2.25rem', { lineHeight: '1.3' }],
-                        'h3': ['1.75rem', { lineHeight: '1.4' }],
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-up': 'slideUp 0.4s ease-out',
-                        'scale-in': 'scaleIn 0.3s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        scaleIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.95)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' },
-                        },
-                    },
-                }
-            }
-        }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
+    <title>J-Order · 秩序</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #F5F5F7;
+            --surface: #FFFFFF;
+            --text: #1D1D1F;
+            --text2: #86868B;
+            --text3: #A1A1A6;
+            --accent: #007AFF;
+            --accent2: #5856D6;
+            --green: #34C759;
+            --orange: #FF9500;
+            --red: #FF3B30;
+            --border: #E5E5EA;
+            --card: rgba(255,255,255,0.8);
+            --r: 14px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
-        
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: 
-                radial-gradient(ellipse at top, hsl(250, 76%, 97%) 0%, transparent 70%),
-                radial-gradient(ellipse at bottom right, hsl(280, 85%, 96%) 0%, transparent 50%),
-                linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(250, 50%, 98%) 100%);
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; min-height: 100dvh;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
         }
-        
-        /* Grain texture overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            opacity: 0.015;
-            pointer-events: none;
-            z-index: 9999;
+        /* Page system */
+        .page { display:none; min-height:100vh; min-height:100dvh; padding-bottom:100px; }
+        .page.active { display:block; }
+        /* Header */
+        .hdr { padding:56px 20px 12px; }
+        .hdr h1 { font-size:34px; font-weight:700; letter-spacing:-0.5px; }
+        .hdr p { font-size:15px; color:var(--text2); margin-top:4px; }
+        /* Order card */
+        .order-card {
+            margin:16px 20px; padding:24px; background:var(--surface);
+            border-radius:20px; box-shadow:0 1px 4px rgba(0,0,0,0.04);
+            border:1px solid var(--border);
         }
-        
-        .page {
-            display: none;
-            min-height: 100vh;
+        .order-top { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+        .order-dot {
+            width:48px; height:48px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center; font-size:22px;
         }
-        .page.active {
-            display: block;
+        .order-dot.green { background:#E8F5E9; }
+        .order-dot.orange { background:#FFF3E0; }
+        .order-dot.red { background:#FFEBEE; }
+        .order-label { font-size:13px; color:var(--text2); font-weight:500; text-transform:uppercase; letter-spacing:0.5px; }
+        .order-val { font-size:20px; font-weight:600; margin-top:2px; }
+        .order-msg { font-size:15px; color:var(--text2); line-height:1.6; padding-top:16px; border-top:1px solid var(--border); }
+        .order-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
+        .stat { text-align:center; }
+        .stat-n { font-size:28px; font-weight:700; }
+        .stat-l { font-size:12px; color:var(--text3); margin-top:2px; font-weight:500; }
+        /* Section */
+        .sec { margin-top:28px; padding:0 20px; }
+        .sec-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .sec-ttl { font-size:22px; font-weight:600; }
+        .sec-act { font-size:15px; color:var(--accent); font-weight:500; cursor:pointer; }
+        /* Task card */
+        .tasks { display:flex; flex-direction:column; gap:8px; }
+        .task {
+            background:var(--surface); border-radius:var(--r); padding:16px;
+            border:1px solid var(--border); display:flex; align-items:flex-start; gap:14px;
+            cursor:pointer; transition:all 0.2s; position:relative;
         }
-        
-        /* Glassmorphism card */
-        .card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 
-                0 4px 24px rgba(100, 80, 140, 0.08),
-                0 1px 3px rgba(100, 80, 140, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+        .task:active { transform:scale(0.98); }
+        .task.done { opacity:0.45; }
+        .task.done .task-t { text-decoration:line-through; }
+        .task-bar {
+            position:absolute; left:0; top:0; bottom:0; width:4px;
+            border-radius:2px;
         }
-        
-        /* Premium button with gradient */
-        .btn-primary {
-            background: linear-gradient(135deg, hsl(250, 76%, 55%) 0%, hsl(280, 85%, 50%) 100%);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            padding: 16px 28px;
-            font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 4px 16px hsla(250, 76%, 55%, 0.3),
-                inset 0 1px 0 hsla(0, 0%, 100%, 0.2);
-            position: relative;
-            overflow: hidden;
+        .task-bar.urgent { background:var(--red); }
+        .task-bar.high { background:var(--orange); }
+        .task-bar.normal { background:var(--accent); }
+        .task-bar.low { background:var(--text3); }
+        .chk {
+            width:24px; height:24px; border-radius:50%; border:2px solid var(--border);
+            flex-shrink:0; display:flex; align-items:center; justify-content:center;
+            cursor:pointer; transition:all 0.15s; margin-top:1px;
         }
-        
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%);
-            pointer-events: none;
+        .chk:active { transform:scale(0.85); }
+        .chk.on { background:var(--green); border-color:var(--green); }
+        .chk.on::after { content:'✓'; color:#fff; font-size:14px; font-weight:600; }
+        .task-info { flex:1; min-width:0; }
+        .task-t { font-size:16px; font-weight:500; line-height:1.4; }
+        .task-meta { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
+        .tag {
+            font-size:11px; font-weight:600; padding:3px 8px; border-radius:20px;
+            text-transform:uppercase; letter-spacing:0.3px;
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 
-                0 8px 28px hsla(250, 76%, 55%, 0.4),
-                inset 0 1px 0 hsla(0, 0%, 100%, 0.2);
+        .tag-work { background:#EFF6FF; color:var(--accent); }
+        .tag-life { background:#ECFDF5; color:var(--green); }
+        .tag-health { background:#FFF7ED; color:var(--orange); }
+        .tag-fin { background:#F5F3FF; color:var(--accent2); }
+        .task-time { font-size:12px; color:var(--text3); font-weight:500; }
+        .task-time.overdue { color:var(--red); }
+        .delay-badge { font-size:11px; color:var(--red); font-weight:600; }
+        /* AI page */
+        .ai-pg { display:flex; flex-direction:column; min-height:100vh; min-height:100dvh; }
+        .ai-hdr { padding:56px 20px 20px; text-align:center; }
+        .ai-hdr h2 { font-size:28px; font-weight:700; }
+        .ai-hdr p { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
+        .ai-body { flex:1; padding:20px; display:flex; flex-direction:column; }
+        .ai-ta {
+            width:100%; flex:1; min-height:200px; padding:20px;
+            border:1px solid var(--border); border-radius:20px;
+            font-size:17px; font-family:inherit; line-height:1.6;
+            color:var(--text); background:var(--surface); resize:none; outline:none;
         }
-        
-        .btn-primary:active {
-            transform: translateY(-1px);
-            box-shadow: 
-                0 4px 16px hsla(250, 76%, 55%, 0.3),
-                inset 0 1px 0 hsla(0, 0%, 100%, 0.2);
+        .ai-ta:focus { border-color:var(--accent); }
+        .ai-ta::placeholder { color:var(--text3); }
+        .ai-btns { padding:20px; display:flex; flex-direction:column; gap:12px; }
+        .btn {
+            width:100%; padding:16px; border:none; border-radius:var(--r);
+            font-size:17px; font-weight:600; cursor:pointer; font-family:inherit;
+            transition:all 0.15s;
         }
-        
-        /* Modern input field */
-        .input-field {
-            width: 100%;
-            padding: 16px 18px;
-            border: 2px solid hsl(250, 30%, 88%);
-            border-radius: 14px;
-            font-size: 16px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            background: white;
+        .btn:active { transform:scale(0.98); }
+        .btn-primary { background:var(--text); color:#fff; }
+        .btn-primary:disabled { opacity:0.35; cursor:not-allowed; }
+        .btn-voice {
+            background:var(--accent); color:#fff;
+            display:flex; align-items:center; justify-content:center; gap:8px;
         }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: hsl(250, 76%, 55%);
-            box-shadow: 0 0 0 4px hsla(250, 76%, 55%, 0.1);
+        .btn-voice.recording { animation:pulse 1.5s infinite; background:var(--red); }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        .btn-ghost { background:var(--bg); color:var(--text); }
+        /* Result page */
+        .res-hdr { padding:56px 20px 20px; text-align:center; }
+        .res-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:6px 14px; background:#ECFDF5; border-radius:20px;
+            font-size:14px; font-weight:600; color:var(--green); margin-bottom:16px;
         }
-        
-        /* Elevated task card */
-        .task-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 14px;
-            box-shadow: 
-                0 2px 12px rgba(100, 80, 140, 0.06),
-                0 1px 3px rgba(100, 80, 140, 0.04);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid hsla(250, 30%, 90%, 0.5);
+        .res-hdr h2 { font-size:24px; font-weight:700; }
+        .res-hdr p { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
+        .res-card {
+            margin:20px; padding:20px; background:var(--surface);
+            border-radius:20px; border:1px solid var(--border);
         }
-        
-        .task-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 
-                0 8px 24px rgba(100, 80, 140, 0.12),
-                0 2px 6px rgba(100, 80, 140, 0.08);
+        .res-card h4 { font-size:13px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+        .res-item { padding:12px 0; border-bottom:1px solid var(--border); }
+        .res-item:last-child { border-bottom:none; }
+        .res-item-t { font-size:16px; font-weight:500; }
+        .res-item-m { font-size:13px; color:var(--text2); margin-top:4px; }
+        .res-actions { padding:20px; display:flex; flex-direction:column; gap:12px; }
+        /* Detail page */
+        .det-hdr { padding:56px 20px 12px; }
+        .det-back { font-size:17px; color:var(--accent); font-weight:500; cursor:pointer; }
+        .det-body { padding:0 20px 20px; }
+        .det-ttl { font-size:28px; font-weight:700; line-height:1.3; }
+        .det-meta { margin-top:20px; background:var(--surface); border-radius:20px; border:1px solid var(--border); overflow:hidden; }
+        .det-row { display:flex; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
+        .det-row:last-child { border-bottom:none; }
+        .det-lbl { font-size:15px; color:var(--text2); }
+        .det-val { font-size:15px; font-weight:500; }
+        .det-notes { margin-top:20px; }
+        .det-notes h4 { font-size:13px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+        .det-ta {
+            width:100%; min-height:100px; padding:16px; border:1px solid var(--border);
+            border-radius:var(--r); font-size:15px; font-family:inherit; line-height:1.5;
+            color:var(--text); background:var(--surface); resize:none; outline:none;
         }
-        
-        /* Pill-style tags */
-        .task-tag {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.02em;
+        .det-ta:focus { border-color:var(--accent); }
+        /* Weekly page */
+        .week-card { margin:16px 20px; padding:24px; background:var(--surface); border-radius:20px; border:1px solid var(--border); }
+        .week-days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:16px; }
+        .wd { text-align:center; }
+        .wd-l { font-size:11px; color:var(--text3); font-weight:500; margin-bottom:6px; }
+        .wd-bar { height:56px; background:var(--bg); border-radius:8px; position:relative; overflow:hidden; }
+        .wd-fill { position:absolute; bottom:0; left:0; right:0; background:var(--accent); border-radius:8px; transition:height 0.4s; }
+        .wd-fill.today { background:var(--green); }
+        .wd-v { font-size:11px; color:var(--text2); margin-top:4px; font-weight:600; }
+        .streak-card {
+            margin:16px 20px; padding:24px;
+            background:linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
+            border-radius:20px; color:#fff;
         }
-        
-        .tag-job { 
-            background: linear-gradient(135deg, hsl(210, 90%, 94%) 0%, hsl(210, 90%, 88%) 100%); 
-            color: hsl(210, 90%, 30%);
-            border: 1px solid hsla(210, 90%, 70%, 0.3);
+        .streak-n { font-size:48px; font-weight:700; }
+        .streak-l { font-size:15px; opacity:0.8; margin-top:4px; }
+        /* Bottom nav */
+        .bnav {
+            position:fixed; bottom:0; left:0; right:0;
+            background:rgba(255,255,255,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            border-top:1px solid var(--border); display:flex; justify-content:space-around;
+            padding:8px 0; padding-bottom:max(8px, var(--safe-bottom)); z-index:100;
         }
-        
-        .tag-project { 
-            background: linear-gradient(135deg, hsl(40, 90%, 94%) 0%, hsl(40, 90%, 88%) 100%); 
-            color: hsl(40, 90%, 35%);
-            border: 1px solid hsla(40, 90%, 70%, 0.3);
+        .bnav-item {
+            display:flex; flex-direction:column; align-items:center; gap:2px;
+            padding:6px 16px; cursor:pointer; border-radius:12px;
         }
-        
-        .tag-travel { 
-            background: linear-gradient(135deg, hsl(150, 70%, 92%) 0%, hsl(150, 70%, 85%) 100%); 
-            color: hsl(150, 70%, 25%);
-            border: 1px solid hsla(150, 70%, 60%, 0.3);
+        .bnav-item:active { background:var(--bg); }
+        .bnav-icon { font-size:24px; }
+        .bnav-lbl { font-size:10px; font-weight:500; color:var(--text3); }
+        .bnav-item.active .bnav-lbl { color:var(--accent); font-weight:600; }
+        /* FAB */
+        .fab {
+            position:fixed; bottom:90px; right:20px; width:56px; height:56px;
+            border-radius:50%; background:var(--accent); color:#fff; border:none;
+            font-size:28px; cursor:pointer; box-shadow:0 4px 16px rgba(0,122,255,0.3);
+            display:flex; align-items:center; justify-content:center; transition:all 0.15s; z-index:99;
         }
-        
-        .tag-exam { 
-            background: linear-gradient(135deg, hsl(340, 80%, 94%) 0%, hsl(340, 80%, 88%) 100%); 
-            color: hsl(340, 80%, 35%);
-            border: 1px solid hsla(340, 80%, 70%, 0.3);
+        .fab:active { transform:scale(0.9); }
+        /* Celebration */
+        .cele {
+            position:fixed; inset:0; background:rgba(0,0,0,0.45);
+            display:none; align-items:center; justify-content:center; z-index:1000;
         }
-        
-        /* Gradient progress bar */
-        .progress-bar {
-            height: 8px;
-            background: hsl(250, 20%, 92%);
-            border-radius: 4px;
-            overflow: hidden;
+        .cele.show { display:flex; }
+        .cele-box {
+            background:var(--surface); border-radius:20px; padding:40px 32px;
+            text-align:center; max-width:300px;
+            animation:scaleIn 0.35s cubic-bezier(0.16,1,0.3,1);
         }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, hsl(250, 76%, 55%) 0%, hsl(280, 85%, 50%) 100%);
-            border-radius: 4px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+        .cele-emoji { font-size:56px; margin-bottom:12px; }
+        .cele-ttl { font-size:22px; font-weight:700; }
+        .cele-msg { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
+        .cele-stat { margin-top:20px; padding:16px; background:var(--bg); border-radius:var(--r); }
+        .cele-stat-n { font-size:32px; font-weight:700; color:var(--green); }
+        .cele-stat-l { font-size:13px; color:var(--text2); margin-top:2px; }
+        @keyframes scaleIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .slide-up { animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1); }
+        /* Empty state */
+        .empty { text-align:center; padding:48px 20px; }
+        .empty-emoji { font-size:48px; margin-bottom:12px; }
+        .empty-ttl { font-size:18px; font-weight:600; }
+        .empty-msg { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
+        /* Loading */
+        .loading { display:flex; align-items:center; justify-content:center; padding:48px; }
+        .spinner {
+            width:28px; height:28px; border:3px solid var(--border);
+            border-top-color:var(--accent); border-radius:50%;
+            animation:spin 0.7s linear infinite;
         }
-        
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        /* Floating navigation bar */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid hsla(250, 30%, 90%, 0.5);
-            padding: 12px 0;
-            display: flex;
-            justify-content: space-around;
-            box-shadow: 0 -4px 24px rgba(100, 80, 140, 0.08);
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 16px;
-            color: hsl(250, 15%, 55%);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-radius: 12px;
-        }
-        
-        .nav-item:hover {
-            background: hsla(250, 76%, 55%, 0.05);
-        }
-        
-        .nav-item.active {
-            color: hsl(250, 76%, 55%);
-            background: hsla(250, 76%, 55%, 0.08);
-        }
-        
-        .nav-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-            transition: transform 0.2s ease;
-        }
-        
-        .nav-item:hover .nav-icon {
-            transform: scale(1.1);
-        }
-        
-        .nav-label {
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-        }
-        
-        /* Floating action button */
-        .floating-btn {
-            position: fixed;
-            bottom: 90px;
-            right: 24px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, hsl(250, 76%, 55%) 0%, hsl(280, 85%, 50%) 100%);
-            color: white;
-            border: none;
-            font-size: 32px;
-            cursor: pointer;
-            box-shadow: 
-                0 8px 28px hsla(250, 76%, 55%, 0.4),
-                inset 0 1px 0 hsla(0, 0%, 100%, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .floating-btn:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 
-                0 12px 36px hsla(250, 76%, 55%, 0.5),
-                inset 0 1px 0 hsla(0, 0%, 100%, 0.2);
-        }
-        
-        .floating-btn:active {
-            transform: scale(1.05) rotate(90deg);
-        }
-        
-        /* Modal with backdrop blur */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(50, 40, 80, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 24px;
-            padding: 28px;
-            width: 100%;
-            max-width: 420px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 
-                0 24px 64px rgba(100, 80, 140, 0.2),
-                0 8px 24px rgba(100, 80, 140, 0.15);
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        /* AI input area with gradient border */
-        .ai-input-area {
-            background: linear-gradient(135deg, hsl(250, 76%, 97%) 0%, hsl(280, 85%, 96%) 100%);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 2px solid hsla(250, 76%, 55%, 0.15);
-            position: relative;
-        }
-        
-        .ai-input-area::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(135deg, hsl(250, 76%, 55%) 0%, hsl(280, 85%, 50%) 100%);
-            border-radius: 20px;
-            z-index: -1;
-            opacity: 0.1;
-        }
-        
-        /* View type selector with modern pills */
-        .view-type-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding: 4px;
-            background: hsla(250, 20%, 92%, 0.5);
-            border-radius: 14px;
-        }
-        
-        .view-type-btn {
-            padding: 10px 18px;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            background: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s ease;
-            color: hsl(250, 15%, 55%);
-        }
-        
-        .view-type-btn:hover {
-            background: hsla(250, 76%, 55%, 0.05);
-        }
-        
-        .view-type-btn.active {
-            background: linear-gradient(135deg, hsl(250, 76%, 55%) 0%, hsl(280, 85%, 50%) 100%);
-            color: white;
-            box-shadow: 0 4px 12px hsla(250, 76%, 55%, 0.3);
-        }
-        
-        /* VIP badge with metallic effect */
-        .vip-badge {
-            background: linear-gradient(135deg, hsl(45, 90%, 60%) 0%, hsl(35, 90%, 55%) 100%);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 14px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            box-shadow: 
-                0 4px 12px hsla(45, 90%, 60%, 0.3),
-                inset 0 1px 0 hsla(0, 0%, 100%, 0.3);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        /* Safety warning with modern design */
-        .safety-warning {
-            background: linear-gradient(135deg, hsl(0, 80%, 97%) 0%, hsl(0, 80%, 94%) 100%);
-            border: 2px solid hsl(0, 80%, 85%);
-            color: hsl(0, 80%, 35%);
-            padding: 16px 18px;
-            border-radius: 14px;
-            margin-bottom: 16px;
-            display: none;
-            font-weight: 500;
-        }
-        
-        .safety-warning.show {
-            display: block;
-            animation: slideUp 0.3s ease-out;
-        }
-        
-        /* Animation classes */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .animate-slide-in {
-            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: hsla(250, 20%, 92%, 0.5);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, hsl(250, 30%, 75%) 0%, hsl(250, 30%, 65%) 100%);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, hsl(250, 30%, 65%) 0%, hsl(250, 30%, 55%) 100%);
-        }
+        @keyframes spin { to{transform:rotate(360deg)} }
     </style>
 </head>
 <body>
-    <!-- 登录页 -->
-    <div id="login-page" class="page active">
-        <div class="min-h-screen flex items-center justify-center p-6">
-            <div class="card w-full max-w-sm animate-scale-in">
-                <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/30">
-                        <span class="text-white text-4xl">🎯</span>
-                    </div>
-                    <h1 class="text-h1 font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">J 人</h1>
-                    <p class="text-gray-500 mt-3 text-lg">智能任务管理助手</p>
-                </div>
-                
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">手机号</label>
-                        <input type="tel" id="phone-input" class="input-field" placeholder="请输入手机号" maxlength="11">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">验证码</label>
-                        <div class="flex gap-3">
-                            <input type="text" id="code-input" class="input-field flex-1" placeholder="6 位验证码" maxlength="6">
-                            <button id="send-code-btn" class="px-5 py-3 border-2 border-primary-500 text-primary-600 rounded-xl font-semibold hover:bg-primary-50 transition-all hover:shadow-md">
-                                发送
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="safety-warning" id="safety-warning">
-                        ⚠️ 检测到可能存在风险的内容，为了您的安全，无法继续操作。如有需要，请联系专业机构寻求帮助。
-                    </div>
-                    
-                    <button class="btn-primary mt-6 text-lg" onclick="handleLogin()">登录</button>
-                </div>
-                
-                <p class="text-center text-xs text-gray-400 mt-6">
-                    登录即表示同意《用户协议》和《隐私政策》
-                </p>
+
+<!-- ============ PAGE: 首页 · 今日秩序 ============ -->
+<div id="pg-home" class="page active">
+    <div class="hdr">
+        <h1 id="greet">早上好</h1>
+        <p id="dateStr"></p>
+    </div>
+    <div class="order-card slide-up">
+        <div class="order-top">
+            <div class="order-dot orange" id="oDot">⚡</div>
+            <div>
+                <div class="order-label">秩序值</div>
+                <div class="order-val" id="oVal">秩序正在恢复中</div>
             </div>
+        </div>
+        <div class="order-msg" id="oMsg">你的事项已经重新归位。当前优先级已明确。</div>
+        <div class="order-stats">
+            <div class="stat"><div class="stat-n" id="sTotal">0</div><div class="stat-l">待办</div></div>
+            <div class="stat"><div class="stat-n" id="sDone">0</div><div class="stat-l">已完成</div></div>
+            <div class="stat"><div class="stat-n" id="sRate">0%</div><div class="stat-l">完成率</div></div>
         </div>
     </div>
-
-    <!-- 主页面 -->
-    <div id="main-page" class="page active">
-        <!-- AI 智能输入区 -->
-        <div class="p-5 pb-3">
-            <div class="ai-input-area animate-slide-in">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30">
-                        <span class="text-white text-2xl">⚡</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg">AI 智能整理</h3>
-                        <p class="text-sm text-gray-500">语音/文字输入，自动分类</p>
-                    </div>
-                </div>
-                
-                <textarea id="ai-input" class="input-field mb-4" rows="3" placeholder="输入进度更新，AI 自动识别分类...&#10;例如：&#10;• 下周要去日本旅游 5 天&#10;• 开始准备公务员考试&#10;• 面试通过了字节跳动的二面"></textarea>
-                
-                <div class="flex gap-3">
-                    <button class="flex-1 btn-primary py-4 text-base" onclick="handleAIInput()">
-                        🎤 语音输入
-                    </button>
-                    <button class="flex-1 btn-primary py-4 text-base" onclick="handleAIInput()">
-                        ✨ 立即整理
-                    </button>
-                </div>
-            </div>
+    <div class="sec">
+        <div class="sec-hdr">
+            <div class="sec-ttl">今日任务</div>
+            <div class="sec-act" onclick="navTo('pg-ai')">+ AI 整理</div>
         </div>
-
-        <!-- 视图类型选择 -->
-        <div class="px-5">
-            <div class="view-type-selector">
-                <button class="view-type-btn active" data-view="all">全部</button>
-                <button class="view-type-btn" data-view="timeline">时间轴</button>
-                <button class="view-type-btn" data-view="gantt">甘特图</button>
-                <button class="view-type-btn" data-view="kanban">看板</button>
-                <button class="view-type-btn" data-view="calendar">日历</button>
-            </div>
-        </div>
-
-        <!-- 任务列表 -->
-        <div id="list-view" class="px-5 pb-28">
-            <!-- 求职进度 -->
-            <div class="mb-8 animate-slide-in">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-h3 font-bold text-gray-800">求职进度</h2>
-                    <span class="text-sm text-gray-500 font-medium">2 个进行中</span>
-                </div>
-                
-                <div class="task-card animate-slide-in" onclick="openTaskDetail('travel')">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-lg">高级产品经理</h3>
-                            <p class="text-sm text-gray-500 mt-1">字节跳动</p>
-                        </div>
-                        <span class="task-tag tag-job">面试中</span>
-                    </div>
-                    <div class="progress-bar mb-3">
-                        <div class="progress-fill" style="width: 60%"></div>
-                    </div>
-                    <p class="text-sm text-gray-600">"已通过初面，等待二面安排"</p>
-                    <div class="flex items-center justify-between mt-4">
-                        <span class="text-xs text-gray-400">更新于 2 小时前</span>
-                        <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
-                    </div>
-                </div>
-                
-                <div class="task-card animate-slide-in">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-lg">前端工程师</h3>
-                            <p class="text-sm text-gray-500 mt-1">腾讯</p>
-                        </div>
-                        <span class="task-tag tag-job">简历筛选</span>
-                    </div>
-                    <div class="progress-bar mb-3">
-                        <div class="progress-fill" style="width: 25%"></div>
-                    </div>
-                    <p class="text-sm text-gray-600">"已投递简历，等待 HR 联系"</p>
-                    <div class="flex items-center justify-between mt-4">
-                        <span class="text-xs text-gray-400">更新于 1 天前</span>
-                        <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 项目进度 -->
-            <div class="mb-8 animate-slide-in">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-h3 font-bold text-gray-800">项目进度</h2>
-                    <span class="text-sm text-gray-500 font-medium">3 个进行中</span>
-                </div>
-                
-                <div class="task-card animate-slide-in">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-lg">日本东京自由行</h3>
-                            <p class="text-sm text-gray-500 mt-1">2026.05.15 - 2026.05.20</p>
-                        </div>
-                        <span class="task-tag tag-travel">筹备中</span>
-                    </div>
-                    <div class="progress-bar mb-3">
-                        <div class="progress-fill" style="width: 40%"></div>
-                    </div>
-                    <p class="text-sm text-gray-600">"机票已订，酒店和行程待确认"</p>
-                    <div class="flex items-center justify-between mt-4">
-                        <span class="text-xs text-gray-400">更新于 3 小时前</span>
-                        <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
-                    </div>
-                </div>
-                
-                <div class="task-card animate-slide-in">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-lg">公务员考试备考</h3>
-                            <p class="text-sm text-gray-500 mt-1">目标：2026 年国考</p>
-                        </div>
-                        <span class="task-tag tag-exam">学习中</span>
-                    </div>
-                    <div class="progress-bar mb-3">
-                        <div class="progress-fill" style="width: 35%"></div>
-                    </div>
-                    <p class="text-sm text-gray-600">"行测完成 60%，申论刚开始"</p>
-                    <div class="flex items-center justify-between mt-4">
-                        <span class="text-xs text-gray-400">更新于 5 小时前</span>
-                        <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
-                    </div>
-                </div>
-                
-                <div class="task-card animate-slide-in">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-lg">J 人任务 App 开发</h3>
-                            <p class="text-sm text-gray-500 mt-1">与 AI 搭档合作项目</p>
-                        </div>
-                        <span class="task-tag tag-project">开发中</span>
-                    </div>
-                    <div class="progress-bar mb-3">
-                        <div class="progress-fill" style="width: 100%"></div>
-                    </div>
-                    <p class="text-sm text-gray-600">"视觉设计完成，已上线部署 ✅"</p>
-                    <div class="flex items-center justify-between mt-4">
-                        <span class="text-xs text-gray-400">更新于 刚刚</span>
-                        <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 甘特图视图（隐藏，点击切换显示） -->
-            <div id="gantt-view" class="mb-8 hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-h3 font-bold text-gray-800">甘特图视图</h2>
-                    <span class="text-sm text-gray-500 font-medium">2026 年 5 月</span>
-                </div>
-                <div class="card overflow-x-auto">
-                    <div class="min-w-[600px]">
-                        <!-- 日期头 -->
-                        <div class="flex border-b pb-3 mb-5">
-                            <div class="w-32 flex-shrink-0 text-sm font-bold text-gray-600">任务</div>
-                            <div class="flex-1 grid grid-cols-31 gap-1">
-                                <!-- 31 天 -->
-                                <script>
-                                    for(let i=1; i<=31; i++) {
-                                        document.write(`<div class="text-xs text-center text-gray-400 font-medium">${i}</div>`);
-                                    }
-                                </script>
-                            </div>
-                        </div>
-                        
-                        <!-- 任务条 -->
-                        <div class="space-y-4">
-                            <div class="flex items-center">
-                                <div class="w-32 flex-shrink-0 text-sm font-semibold text-gray-800">日本旅游</div>
-                                <div class="flex-1 relative h-10">
-                                    <div class="absolute left-[28%] w-[16%] h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full opacity-80 shadow-lg"></div>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-32 flex-shrink-0 text-sm font-semibold text-gray-800">公务员考试</div>
-                                <div class="flex-1 relative h-10">
-                                    <div class="absolute left-[0%] w-[60%] h-full bg-gradient-to-r from-pink-400 to-rose-500 rounded-full opacity-80 shadow-lg"></div>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-32 flex-shrink-0 text-sm font-semibold text-gray-800">J 人 App 开发</div>
-                                <div class="flex-1 relative h-10">
-                                    <div class="absolute left-[10%] w-[40%] h-full bg-gradient-to-r from-primary-400 to-accent-500 rounded-full opacity-80 shadow-lg"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 看板视图（隐藏，点击切换显示） -->
-            <div id="kanban-view" class="mb-8 hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-h3 font-bold text-gray-800">看板视图</h2>
-                </div>
-                <div class="grid grid-cols-3 gap-5 overflow-x-auto">
-                    <!-- 待开始 -->
-                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                        <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
-                            <span class="w-3 h-3 bg-gray-400 rounded-full"></span>
-                            待开始
-                        </h3>
-                        <div class="space-y-3">
-                            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                                <p class="text-sm font-bold text-gray-800">腾讯前端工程师</p>
-                                <p class="text-xs text-gray-500 mt-2">简历筛选</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 进行中 -->
-                    <div class="bg-primary-50 rounded-2xl p-4 border border-primary-200">
-                        <h3 class="font-bold text-primary-700 mb-4 flex items-center gap-2">
-                            <span class="w-3 h-3 bg-primary-500 rounded-full"></span>
-                            进行中
-                        </h3>
-                        <div class="space-y-3">
-                            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                                <p class="text-sm font-bold text-gray-800">字节产品经理</p>
-                                <p class="text-xs text-gray-500 mt-2">面试中</p>
-                            </div>
-                            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                                <p class="text-sm font-bold text-gray-800">日本旅游</p>
-                                <p class="text-xs text-gray-500 mt-2">筹备中</p>
-                            </div>
-                            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                                <p class="text-sm font-bold text-gray-800">公务员考试</p>
-                                <p class="text-xs text-gray-500 mt-2">学习中</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 已完成 -->
-                    <div class="bg-green-50 rounded-2xl p-4 border border-green-200">
-                        <h3 class="font-bold text-green-700 mb-4 flex items-center gap-2">
-                            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
-                            已完成
-                        </h3>
-                        <div class="space-y-3">
-                            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 opacity-60">
-                                <p class="text-sm font-bold text-gray-800">简历优化</p>
-                                <p class="text-xs text-gray-500 mt-2">已完成</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 日历视图（隐藏，点击切换显示） -->
-            <div id="calendar-view" class="mb-8 hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-h3 font-bold text-gray-800">日历视图</h2>
-                    <span class="text-sm text-gray-500 font-medium">2026 年 5 月</span>
-                </div>
-                <div class="card">
-                    <!-- 星期头 -->
-                    <div class="grid grid-cols-7 gap-2 mb-3">
-                        <div class="text-center text-sm text-red-500 font-bold">日</div>
-                        <div class="text-center text-sm text-gray-600 font-bold">一</div>
-                        <div class="text-center text-sm text-gray-600 font-bold">二</div>
-                        <div class="text-center text-sm text-gray-600 font-bold">三</div>
-                        <div class="text-center text-sm text-gray-600 font-bold">四</div>
-                        <div class="text-center text-sm text-gray-600 font-bold">五</div>
-                        <div class="text-center text-sm text-blue-500 font-bold">六</div>
-                    </div>
-                    <!-- 日历网格 -->
-                    <div class="grid grid-cols-7 gap-2">
-                        <!-- 空白 -->
-                        <div class="aspect-square bg-gray-50 rounded-xl"></div>
-                        <div class="aspect-square bg-gray-50 rounded-xl"></div>
-                        <!-- 1 号 -->
-                        <div class="aspect-square border-2 border-primary-300 rounded-xl p-2 relative bg-primary-50">
-                            <span class="text-sm font-bold">1</span>
-                            <div class="absolute bottom-2 left-2 right-2">
-                                <div class="text-xs bg-primary-200 text-primary-700 rounded px-2 py-1 truncate font-medium">旅游</div>
-                            </div>
-                        </div>
-                        <!-- 2-31 号简化显示 -->
-                        <script>
-                            for(let i=2; i<=31; i++) {
-                                const hasEvent = [1,5,10,15,20,25].includes(i);
-                                document.write(`<div class="aspect-square border rounded-xl p-2 relative ${hasEvent ? 'border-primary-300 bg-primary-50' : 'bg-gray-50 border-gray-200'}">
-                                    <span class="text-sm font-medium">${i}</span>
-                                    ${hasEvent ? `<div class="absolute bottom-2 left-2 right-2"><div class="text-xs bg-primary-200 text-primary-700 rounded px-2 py-1 truncate font-medium">任务</div></div>` : ''}
-                                </div>`);
-                            }
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 浮动添加按钮 -->
-        <button class="floating-btn" onclick="openAddModal()" id="fab-btn">+</button>
+        <div class="tasks" id="taskList"></div>
     </div>
+</div>
 
-    <!-- VIP 页面 -->
-    <div id="vip-page" class="page">
-        <div class="p-5 pb-28">
-            <div class="card text-center py-16 animate-scale-in">
-                <div class="text-7xl mb-6">👑</div>
-                <h2 class="text-h2 font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-3">升级 VIP</h2>
-                <p class="text-gray-500 mb-8 text-lg">解锁更多高级功能</p>
-                
-                <div class="space-y-5 text-left max-w-sm mx-auto">
-                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-primary-50 to-accent-50">
-                        <span class="text-3xl">🎨</span>
-                        <div>
-                            <h4 class="font-bold text-gray-800">自定义皮肤</h4>
-                            <p class="text-sm text-gray-500">个性化主题配色</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-accent-50 to-primary-50">
-                        <span class="text-3xl">📔</span>
-                        <div>
-                            <h4 class="font-bold text-gray-800">电子手帐本</h4>
-                            <p class="text-sm text-gray-500">精美模板，记录生活</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-primary-50 to-accent-50">
-                        <span class="text-3xl">📊</span>
-                        <div>
-                            <h4 class="font-bold text-gray-800">高级统计</h4>
-                            <p class="text-sm text-gray-500">深度数据分析</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-accent-50 to-primary-50">
-                        <span class="text-3xl">🔔</span>
-                        <div>
-                            <h4 class="font-bold text-gray-800">智能提醒</h4>
-                            <p class="text-sm text-gray-500">自定义提醒规则</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="btn-primary mt-10 py-5 text-xl font-bold" onclick="alert('感谢支持！VIP 功能开发中~')">
-                    ¥19.9 永久解锁
-                </button>
-                <p class="text-xs text-gray-400 mt-4">一次性付费，终身使用</p>
-            </div>
+<!-- ============ PAGE: AI 语音输入 ============ -->
+<div id="pg-ai" class="page">
+    <div class="ai-pg">
+        <div class="ai-hdr">
+            <h2>AI 秩序整理</h2>
+            <p>把脑子里的所有事情倒出来<br>AI 帮你自动分类、排序、安排</p>
+        </div>
+        <div class="ai-body">
+            <textarea class="ai-ta" id="aiInput" placeholder="例如：周三要交方案，然后提醒我买猫粮，还有月底续签证，健身也已经拖了三天了..."></textarea>
+        </div>
+        <div class="ai-btns">
+            <button class="btn btn-voice" id="btnVoice" onclick="toggleVoice()">🎤 按住说话</button>
+            <button class="btn btn-primary" id="btnGo" onclick="doAnalyze()" disabled>✨ 开始整理</button>
         </div>
     </div>
+</div>
 
-    <!-- 全局底部导航（所有页面共享） -->
-    <div class="bottom-nav" id="global-bottom-nav" style="display:none;">
-        <div class="nav-item active" onclick="switchTab('home')">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">首页</span>
+<!-- ============ PAGE: AI 整理结果 ============ -->
+<div id="pg-result" class="page">
+    <div class="res-hdr">
+        <div class="res-badge">✓ 整理完成</div>
+        <h2 id="resTitle">事项已重新归位</h2>
+        <p id="resMsg">你的计划系统正在恢复稳定。</p>
+    </div>
+    <div class="res-card slide-up">
+        <h4>AI 提取结果</h4>
+        <div id="resItems"></div>
+    </div>
+    <div class="res-actions">
+        <button class="btn btn-primary" onclick="confirmTasks()">✓ 确认添加任务</button>
+        <button class="btn btn-ghost" onclick="navTo('pg-home')">返回首页</button>
+    </div>
+</div>
+
+<!-- ============ PAGE: 任务详情 ============ -->
+<div id="pg-detail" class="page">
+    <div class="det-hdr"><div class="det-back" onclick="navTo('pg-home')">← 返回</div></div>
+    <div class="det-body">
+        <div class="det-ttl" id="dTitle">任务标题</div>
+        <div class="det-meta">
+            <div class="det-row"><span class="det-lbl">分类</span><span class="det-val" id="dCat">工作</span></div>
+            <div class="det-row"><span class="det-lbl">优先级</span><span class="det-val" id="dPri">高</span></div>
+            <div class="det-row"><span class="det-lbl">截止时间</span><span class="det-val" id="dDead">未设置</span></div>
+            <div class="det-row"><span class="det-lbl">状态</span><span class="det-val" id="dStatus">进行中</span></div>
         </div>
-        <div class="nav-item" onclick="switchTab('tasks')">
-            <span class="nav-icon">📋</span>
-            <span class="nav-label">任务</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('vip')">
-            <span class="nav-icon">👑</span>
-            <span class="nav-label">VIP</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('profile')">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">我的</span>
+        <div class="det-notes">
+            <h4>备注</h4>
+            <textarea class="det-ta" id="dNotes" placeholder="添加备注..."></textarea>
         </div>
     </div>
+</div>
 
-    <!-- 全局浮动添加按钮 -->
-    <button class="floating-btn" onclick="openAddModal()" id="fab-btn">+</button>
-
-    <!-- 任务详情页（手帐风格） -->
-    <div id="task-detail-modal" class="modal">
-        <div class="modal-content">
-            <div class="flex items-center justify-between mb-5">
-                <h3 class="text-h3 font-bold text-gray-800">任务详情</h3>
-                <button onclick="closeTaskDetail()" class="text-gray-400 hover:text-gray-600 text-2xl transition">✕</button>
-            </div>
-            
-            <!-- 任务封面 -->
-            <div class="task-cover mb-5">
-                <div class="h-40 bg-gradient-to-br from-primary-400 via-accent-300 to-primary-500 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-xl">
-                    <div class="absolute inset-0 opacity-20">
-                        <div class="absolute top-6 left-10 w-20 h-20 bg-white rounded-full"></div>
-                        <div class="absolute bottom-8 right-16 w-28 h-28 bg-accent-200 rounded-full"></div>
-                        <div class="absolute top-16 right-10 w-16 h-16 bg-primary-200 rounded-full"></div>
-                    </div>
-                    <span class="text-7xl relative z-10">✈️</span>
-                </div>
-            </div>
-            
-            <!-- 任务标题和标签 -->
-            <div class="flex items-start justify-between mb-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">日本东京自由行</h2>
-                    <p class="text-sm text-gray-500">2026.05.15 - 2026.05.20</p>
-                </div>
-                <span class="task-tag tag-travel text-sm px-5 py-2">筹备中</span>
-            </div>
-            
-            <!-- 进度条 -->
-            <div class="mb-5">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-semibold text-gray-600">整体进度</span>
-                    <span class="text-sm font-bold text-primary-600">40%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 40%"></div>
-                </div>
-            </div>
-            
-            <!-- VIP 皮肤选择器 -->
-            <div class="mb-5 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-300">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-bold text-gray-700">🎨 手帐皮肤</span>
-                    <span class="vip-badge">VIP</span>
-                </div>
-                <div class="flex gap-3 overflow-x-auto pb-2">
-                    <button class="skin-btn active flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 via-accent-300 to-primary-500 border-4 border-primary-600 shadow-lg"></button>
-                    <button class="skin-btn flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-green-400 via-teal-300 to-blue-400 border-4 border-transparent hover:border-green-400 transition"></button>
-                    <button class="skin-btn flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 via-red-300 to-pink-400 border-4 border-transparent hover:border-orange-400 transition"></button>
-                    <button class="skin-btn flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400 via-purple-300 to-pink-400 border-4 border-transparent hover:border-indigo-400 transition"></button>
-                    <button class="skin-btn flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-amber-200 via-yellow-300 to-orange-400 border-4 border-transparent hover:border-amber-400 transition"></button>
-                </div>
-                <p class="text-xs text-gray-500 mt-3">👑 VIP 用户可解锁 20+ 精美皮肤</p>
-            </div>
-            
-            <!-- 手帐时间线 -->
-            <div class="mb-5">
-                <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">
-                    <span>📝</span> 进度记录
-                </h4>
-                <div class="space-y-4 max-h-56 overflow-y-auto">
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-lg">🎫</div>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-800 font-medium">机票已预订</p>
-                            <p class="text-xs text-gray-500 mt-1">5 月 6 日 14:30</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-lg">🏨</div>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-800 font-medium">开始筛选酒店，倾向新宿区域</p>
-                            <p class="text-xs text-gray-500 mt-1">5 月 5 日 10:15</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-lg">📋</div>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-800 font-medium">创建旅行计划</p>
-                            <p class="text-xs text-gray-500 mt-1">5 月 3 日 09:00</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 添加记录输入框 -->
-            <div class="mb-5">
-                <textarea id="progress-note" class="input-field" rows="2" placeholder="记录此刻的想法或进展..."></textarea>
-                <div class="flex gap-3 mt-3">
-                    <button class="flex-1 py-3 px-4 bg-primary-100 text-primary-600 rounded-xl text-sm font-bold hover:bg-primary-200 transition" onclick="addProgressNote()">
-                        📝 添加记录
-                    </button>
-                    <button class="flex-1 py-3 px-4 bg-accent-100 text-accent-600 rounded-xl text-sm font-bold hover:bg-accent-200 transition">
-                        📷 上传图片
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 任务信息 -->
-            <div class="border-t pt-5">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-xs text-gray-500 mb-1">创建时间</p>
-                        <p class="text-sm font-semibold text-gray-800">2026.05.03</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 mb-1">最后更新</p>
-                        <p class="text-sm font-semibold text-gray-800">2 小时前</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 mb-1">提醒设置</p>
-                        <p class="text-sm font-semibold text-gray-800">✅ 已开启</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 mb-1">视图模式</p>
-                        <p class="text-sm font-semibold text-gray-800">时间轴</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 操作按钮 -->
-            <div class="flex gap-3 mt-6">
-                <button class="flex-1 py-4 px-5 border-2 border-primary-500 text-primary-600 rounded-xl font-bold hover:bg-primary-50 transition">
-                    编辑任务
-                </button>
-                <button class="flex-1 py-4 px-5 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-xl font-bold hover:shadow-xl hover:shadow-primary-500/30 transition">
-                    更新进度
-                </button>
-            </div>
+<!-- ============ PAGE: 本周进度 ============ -->
+<div id="pg-weekly" class="page">
+    <div class="hdr">
+        <h1>本周进度</h1>
+        <p>你的秩序恢复情况</p>
+    </div>
+    <div class="streak-card slide-up">
+        <div class="streak-n" id="wkStreak">0</div>
+        <div class="streak-l">连续执行天数</div>
+    </div>
+    <div class="week-card slide-up">
+        <div class="sec-ttl">每日完成情况</div>
+        <div class="week-days" id="wkDays"></div>
+    </div>
+    <div class="order-card slide-up">
+        <div class="order-stats">
+            <div class="stat"><div class="stat-n" id="wkTotal">0</div><div class="stat-l">本周任务</div></div>
+            <div class="stat"><div class="stat-n" id="wkDone">0</div><div class="stat-l">已完成</div></div>
+            <div class="stat"><div class="stat-n" id="wkRate">0%</div><div class="stat-l">完成率</div></div>
         </div>
     </div>
+</div>
 
-    <!-- 添加任务弹窗 -->
-    <div id="add-modal" class="modal">
-        <div class="modal-content">
-            <div class="flex items-center justify-between mb-5">
-                <h3 class="text-h3 font-bold text-gray-800">新建任务</h3>
-                <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 text-2xl transition">✕</button>
-            </div>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">任务名称</label>
-                    <input type="text" id="task-name" class="input-field" placeholder="例如：日本旅游">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">任务类型</label>
-                    <select id="task-type" class="input-field">
-                        <option value="job">求职</option>
-                        <option value="project">项目</option>
-                        <option value="travel">旅游</option>
-                        <option value="exam">考试</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">展示方式</label>
-                    <select id="task-view" class="input-field">
-                        <option value="timeline">时间轴</option>
-                        <option value="gantt">甘特图</option>
-                        <option value="kanban">看板</option>
-                        <option value="calendar">日历</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">开始日期</label>
-                    <input type="date" id="task-start" class="input-field">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">结束日期</label>
-                    <input type="date" id="task-end" class="input-field">
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="task-reminder" class="w-5 h-5 text-primary-500 rounded">
-                    <label for="task-reminder" class="text-sm text-gray-700 font-medium">开启自动提醒</label>
-                </div>
-                
-                <button class="btn-primary mt-4 text-lg" onclick="saveTask()">创建任务</button>
-            </div>
+<!-- ============ CELEBRATION ============ -->
+<div class="cele" id="cele" onclick="this.classList.remove('show')">
+    <div class="cele-box">
+        <div class="cele-emoji">🎯</div>
+        <div class="cele-ttl" id="celTtl">秩序值 +10</div>
+        <div class="cele-msg" id="celMsg">你的计划系统正在恢复稳定。</div>
+        <div class="cele-stat">
+            <div class="cele-stat-n" id="celN">75%</div>
+            <div class="cele-stat-l">当前完成率</div>
         </div>
     </div>
+</div>
 
-    <script>
-        // 页面切换
-        function switchPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
-        }
+<!-- ============ BOTTOM NAV ============ -->
+<div class="bnav" id="bnav">
+    <div class="bnav-item active" onclick="navTo('pg-home')"><span class="bnav-icon">🏠</span><span class="bnav-lbl">今日</span></div>
+    <div class="bnav-item" onclick="navTo('pg-ai')"><span class="bnav-icon">🎤</span><span class="bnav-lbl">AI 整理</span></div>
+    <div class="bnav-item" onclick="navTo('pg-weekly')"><span class="bnav-icon">📊</span><span class="bnav-lbl">本周</span></div>
+</div>
 
-        // 底部导航切换
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            if(event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
-            }
-            
-            const fabBtn = document.getElementById('fab-btn');
-            const mainPage = document.getElementById('main-page');
-            const vipPage = document.getElementById('vip-page');
-            
-            if (tab === 'vip') {
-                mainPage.classList.remove('active');
-                vipPage.classList.add('active');
-                fabBtn.style.display = 'none';
-            } else if (tab === 'home') {
-                vipPage.classList.remove('active');
-                mainPage.classList.add('active');
-                fabBtn.style.display = 'flex';
-            } else if (tab === 'tasks') {
-                vipPage.classList.remove('active');
-                mainPage.classList.add('active');
-                fabBtn.style.display = 'flex';
-            } else if (tab === 'profile') {
-                vipPage.classList.remove('active');
-                mainPage.classList.add('active');
-                fabBtn.style.display = 'none';
-                alert('个人中心功能开发中~');
-            }
-        }
+<!-- ============ FAB ============ -->
+<button class="fab" id="fab" onclick="navTo('pg-ai')">+</button>
 
-        // 登录处理
-        function handleLogin() {
-            const phone = document.getElementById('phone-input').value;
-            const code = document.getElementById('code-input').value;
-            
-            if (!phone || phone.length !== 11) {
-                alert('请输入正确的手机号');
-                return;
-            }
-            
-            if (!code || code.length !== 6) {
-                alert('请输入 6 位验证码');
-                return;
-            }
-            
-            // 模拟登录成功
-            document.getElementById('login-page').classList.remove('active');
-            document.getElementById('main-page').classList.add('active');
-            document.getElementById('global-bottom-nav').style.display = 'flex';
-            document.getElementById('fab-btn').style.display = 'flex';
-        }
+<script>
+// ============================
+// DATA LAYER (localStorage)
+// ============================
+const DB = {
+    get(key, def) { try { return JSON.parse(localStorage.getItem('jorder_'+key)) || def; } catch { return def; } },
+    set(key, val) { localStorage.setItem('jorder_'+key, JSON.stringify(val)); },
+    tasks() { return this.get('tasks', []); },
+    saveTasks(t) { this.set('tasks', t); },
+    stats() { return this.get('stats', { streak:0, daily:{}, totalDone:0 }); },
+    saveStats(s) { this.set('stats', s); }
+};
 
-        // 发送验证码
-        document.getElementById('send-code-btn').addEventListener('click', function() {
-            const phone = document.getElementById('phone-input').value;
-            if (!phone || phone.length !== 11) {
-                alert('请输入正确的手机号');
-                return;
-            }
-            
-            this.textContent = '已发送';
-            this.disabled = true;
-            this.classList.add('bg-primary-50');
-            
-            // 模拟发送验证码
-            setTimeout(() => {
-                alert('验证码已发送：123456（测试用）');
-            }, 1000);
+let pendingTasks = []; // AI 解析后待确认的任务
+
+// ============================
+// NAVIGATION
+// ============================
+function navTo(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    // Update nav
+    const tabs = ['pg-home','pg-ai','pg-weekly'];
+    const idx = tabs.indexOf(pageId);
+    document.querySelectorAll('.bnav-item').forEach((n,i) => {
+        n.classList.toggle('active', i === idx);
+    });
+    // FAB visibility
+    document.getElementById('fab').style.display = (pageId === 'pg-home') ? 'flex' : 'none';
+    // Page-specific init
+    if (pageId === 'pg-home') renderHome();
+    if (pageId === 'pg-weekly') renderWeekly();
+    window.scrollTo(0,0);
+}
+
+// ============================
+// HOME PAGE
+// ============================
+function renderHome() {
+    const tasks = DB.tasks();
+    const today = todayStr();
+    const todayTasks = tasks.filter(t => t.date === today && !t.deleted);
+    const done = todayTasks.filter(t => t.done).length;
+    const total = todayTasks.length;
+    const rate = total ? Math.round(done/total*100) : 0;
+
+    // Stats
+    document.getElementById('sTotal').textContent = total - done;
+    document.getElementById('sDone').textContent = done;
+    document.getElementById('sRate').textContent = rate + '%';
+
+    // Order status
+    const oDot = document.getElementById('oDot');
+    const oVal = document.getElementById('oVal');
+    const oMsg = document.getElementById('oMsg');
+    if (rate >= 80) {
+        oDot.className = 'order-dot green'; oDot.textContent = '✓';
+        oVal.textContent = '高度有序';
+        oMsg.textContent = '你的事项已经重新归位。当前状态：高度有序。继续保持。';
+    } else if (rate >= 40) {
+        oDot.className = 'order-dot orange'; oDot.textContent = '⚡';
+        oVal.textContent = '秩序正在恢复中';
+        oMsg.textContent = '你的计划系统正在恢复稳定。当前优先级已明确。';
+    } else if (total > 0) {
+        oDot.className = 'order-dot red'; oDot.textContent = '⚠';
+        oVal.textContent = '需要关注';
+        oMsg.textContent = '检测到任务堆积。建议优先处理高优先级事项。';
+    } else {
+        oDot.className = 'order-dot orange'; oDot.textContent = '⚡';
+        oVal.textContent = '暂无任务';
+        oMsg.textContent = '使用 AI 整理，把脑子里的事情倒出来。';
+    }
+
+    // Task list
+    const list = document.getElementById('taskList');
+    if (todayTasks.length === 0) {
+        list.innerHTML = `<div class="empty"><div class="empty-emoji">📝</div><div class="empty-ttl">暂无今日任务</div><div class="empty-msg">点击右下角 + 使用 AI 整理<br>或直接添加任务</div></div>`;
+        return;
+    }
+    // Sort: undone first, then by priority
+    const priOrder = { urgent:0, high:1, normal:2, low:3 };
+    todayTasks.sort((a,b) => {
+        if (a.done !== b.done) return a.done ? 1 : -1;
+        return (priOrder[a.pri]||2) - (priOrder[b.pri]||2);
+    });
+    list.innerHTML = todayTasks.map(t => `
+        <div class="task ${t.done?'done':''}" onclick="openDetail('${t.id}')">
+            <div class="task-bar ${t.pri}"></div>
+            <div class="chk ${t.done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div>
+            <div class="task-info">
+                <div class="task-t">${esc(t.title)}</div>
+                <div class="task-meta">
+                    <span class="tag tag-${t.cat||'work'}">${catLabel(t.cat)}</span>
+                    ${t.deadline ? `<span class="task-time ${isOverdue(t.deadline)?'overdue':''}">${fmtDeadline(t.deadline)}</span>` : ''}
+                    ${t.delayed ? '<span class="delay-badge">⚠ 已拖延</span>' : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================
+// TASK CRUD
+// ============================
+function toggleDone(id) {
+    const tasks = DB.tasks();
+    const t = tasks.find(x => x.id === id);
+    if (!t) return;
+    const wasDone = t.done;
+    t.done = !t.done;
+    t.doneAt = t.done ? new Date().toISOString() : null;
+    DB.saveTasks(tasks);
+
+    // Update stats
+    const stats = DB.stats();
+    const today = todayStr();
+    if (!stats.daily[today]) stats.daily[today] = 0;
+    if (t.done) stats.daily[today]++;
+    else stats.daily[today] = Math.max(0, stats.daily[today]-1);
+    stats.totalDone = Object.values(stats.daily).reduce((a,b)=>a+b,0);
+    // Streak
+    stats.streak = calcStreak(stats.daily);
+    DB.saveStats(stats);
+
+    if (t.done && !wasDone) showCelebration(stats);
+    renderHome();
+}
+
+function openDetail(id) {
+    const tasks = DB.tasks();
+    const t = tasks.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById('dTitle').textContent = t.title;
+    document.getElementById('dCat').textContent = catLabel(t.cat);
+    document.getElementById('dPri').textContent = priLabel(t.pri);
+    document.getElementById('dDead').textContent = t.deadline || '未设置';
+    document.getElementById('dStatus').textContent = t.done ? '已完成' : '进行中';
+    document.getElementById('dNotes').value = t.notes || '';
+    navTo('pg-detail');
+}
+
+function addTask(t) {
+    const tasks = DB.tasks();
+    tasks.push({ id: uid(), ...t, done:false, createdAt: new Date().toISOString(), deleted:false });
+    DB.saveTasks(tasks);
+}
+
+// ============================
+// AI ANALYSIS (local fallback)
+// ============================
+function doAnalyze() {
+    const text = document.getElementById('aiInput').value.trim();
+    if (!text) return;
+    // Show loading
+    const btn = document.getElementById('btnGo');
+    btn.disabled = true;
+    btn.textContent = '⏳ AI 分析中...';
+
+    // Use local AI parser (in production, call DashScope API)
+    setTimeout(() => {
+        pendingTasks = parseBrainDump(text);
+        renderResults(pendingTasks);
+        btn.disabled = false;
+        btn.textContent = '✨ 开始整理';
+        navTo('pg-result');
+    }, 800);
+}
+
+function parseBrainDump(text) {
+    // Split by common delimiters
+    const segments = text.split(/[，,、;；。\n]+/).map(s=>s.trim()).filter(s=>s.length>0);
+    const tasks = [];
+    const now = new Date();
+
+    segments.forEach(seg => {
+        if (seg.length < 2) return;
+        const cat = detectCat(seg);
+        const pri = detectPri(seg);
+        const deadline = detectDate(seg, now);
+        const delayed = /拖|落后|应该早|还没|已经.*了/.test(seg);
+
+        tasks.push({
+            title: seg.replace(/^(然后|还有|另外|再|对了|对了还有)\s*/g,''),
+            cat, pri, deadline, delayed,
+            date: todayStr()
         });
+    });
 
-        // AI 输入处理
-        function handleAIInput() {
-            const input = document.getElementById('ai-input').value;
-            
-            if (!input.trim()) {
-                alert('请输入内容');
-                return;
-            }
-            
-            // 安全检查
-            const riskKeywords = ['自杀', '自残', '伤害自己', '结束生命', '轻生'];
-            const hasRisk = riskKeywords.some(keyword => input.includes(keyword));
-            
-            if (hasRisk) {
-                document.getElementById('safety-warning').classList.add('show');
-                return;
-            }
-            
-            document.getElementById('safety-warning').classList.remove('show');
-            
-            // 简单关键词识别
-            let type = 'other';
-            let typeLabel = '其他';
-            
-            if (input.includes('面试') || input.includes('简历') || input.includes('工作') || input.includes('offer')) {
-                type = 'job';
-                typeLabel = '求职';
-            } else if (input.includes('旅游') || input.includes('旅行') || input.includes('机票') || input.includes('酒店')) {
-                type = 'travel';
-                typeLabel = '旅游';
-            } else if (input.includes('考试') || input.includes('学习') || input.includes('公务员') || input.includes('备考')) {
-                type = 'exam';
-                typeLabel = '考试';
-            } else if (input.includes('项目') || input.includes('开发') || input.includes('App') || input.includes('产品')) {
-                type = 'project';
-                typeLabel = '项目';
-            }
-            
-            // 创建任务
-            const taskCard = document.createElement('div');
-            taskCard.className = 'task-card animate-slide-in';
-            taskCard.onclick = function() { openTaskDetail(type); };
-            
-            const tagClass = {
-                'job': 'tag-job',
-                'project': 'tag-project',
-                'travel': 'tag-travel',
-                'exam': 'tag-exam',
-                'other': 'tag-project'
-            };
-            
-            const now = new Date();
-            const timeStr = `${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
-            taskCard.innerHTML = `
-                <div class="flex items-start justify-between mb-3">
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg">${input.substring(0, 30)}${input.length > 30 ? '...' : ''}</h3>
-                        <p class="text-sm text-gray-500 mt-1">AI 智能识别 · ${typeLabel}</p>
-                    </div>
-                    <span class="task-tag ${tagClass[type]}">${typeLabel}</span>
-                </div>
-                <div class="progress-bar mb-3">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-                <p class="text-sm text-gray-600">"AI 已自动分类，开始行动吧！"</p>
-                <div class="flex items-center justify-between mt-4">
-                    <span class="text-xs text-gray-400">更新于 刚刚</span>
-                    <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
-                </div>
-            `;
-            
-            // 添加到列表
-            const listView = document.querySelector('#list-view');
-            const firstSection = listView.querySelector('.mb-8');
-            if (firstSection) {
-                const projectSection = firstSection.nextElementSibling;
-                if (projectSection) {
-                    projectSection.insertBefore(taskCard, projectSection.querySelector('.task-card'));
-                }
-            }
-            
-            document.getElementById('ai-input').value = '';
-            alert(`✅ AI 识别成功！\n\n识别类型：${typeLabel}\n任务已添加到列表`);
+    return tasks;
+}
+
+function detectCat(text) {
+    if (/面试|工作|简历|方案|项目|客户|汇报|会议|产品|代码|bug|需求/.test(text)) return 'work';
+    if (/猫粮|狗粮|买菜|快递|缴费|洗衣|打扫|取件|寄快递|预约/.test(text)) return 'life';
+    if (/健身|运动|跑步|游泳|体检|看病|减肥|瑜伽|复诊|疫苗/.test(text)) return 'health';
+    if (/签证|续|银行|缴费|账单|报税|保险|投资|转账|退款/.test(text)) return 'fin';
+    return 'work';
+}
+
+function detectPri(text) {
+    if (/紧急|必须|马上|立刻|今天|今天一定|deadline|截止/.test(text)) return 'urgent';
+    if (/重要|优先|周三|周四|这周|明天/.test(text)) return 'high';
+    if (/月底|下周|慢慢|有空|有空再|不急/.test(text)) return 'low';
+    return 'normal';
+}
+
+function detectDate(text, now) {
+    const dayMap = { '今天':0, '明天':1, '后天':2 };
+    for (const [word, offset] of Object.entries(dayMap)) {
+        if (text.includes(word)) {
+            const d = new Date(now); d.setDate(d.getDate()+offset);
+            return fmtDate(d);
         }
+    }
+    if (/周三/.test(text)) return nextWeekday(3, now);
+    if (/周四/.test(text)) return nextWeekday(4, now);
+    if (/周五/.test(text)) return nextWeekday(5, now);
+    if (/周一|周一/.test(text)) return nextWeekday(1, now);
+    if (/周末/.test(text)) return nextWeekday(6, now);
+    if (/月底/.test(text)) {
+        const d = new Date(now.getFullYear(), now.getMonth()+1, 0);
+        return fmtDate(d);
+    }
+    if (/这周/.test(text)) {
+        const d = new Date(now); d.setDate(d.getDate() + (5 - d.getDay()));
+        return fmtDate(d);
+    }
+    if (/下周/.test(text)) {
+        const d = new Date(now); d.setDate(d.getDate() + 7 + (5 - d.getDay()));
+        return fmtDate(d);
+    }
+    // Try to find date pattern like 5月14日
+    const m = text.match(/(\d{1,2})[月\/](\d{1,2})[日号]?/);
+    if (m) {
+        const d = new Date(now.getFullYear(), parseInt(m[1])-1, parseInt(m[2]));
+        return fmtDate(d);
+    }
+    return null;
+}
 
-        // 视图类型切换
-        document.querySelectorAll('.view-type-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const view = this.dataset.view;
-                
-                // 按钮样式切换
-                document.querySelectorAll('.view-type-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // 显示对应视图
-                const listView = document.querySelector('#list-view');
-                const ganttView = document.querySelector('#gantt-view');
-                const kanbanView = document.querySelector('#kanban-view');
-                const calendarView = document.querySelector('#calendar-view');
-                
-                if (listView) listView.classList.add('hidden');
-                if (ganttView) ganttView.classList.add('hidden');
-                if (kanbanView) kanbanView.classList.add('hidden');
-                if (calendarView) calendarView.classList.add('hidden');
-                
-                if (view === 'all' || view === 'timeline') {
-                    if (listView) listView.classList.remove('hidden');
-                } else if (view === 'gantt') {
-                    if (ganttView) ganttView.classList.remove('hidden');
-                } else if (view === 'kanban') {
-                    if (kanbanView) kanbanView.classList.remove('hidden');
-                } else if (view === 'calendar') {
-                    if (calendarView) calendarView.classList.remove('hidden');
-                }
-            });
-        });
+function nextWeekday(day, now) {
+    const d = new Date(now);
+    const diff = day - d.getDay();
+    d.setDate(d.getDate() + (diff <= 0 ? diff + 7 : diff));
+    return fmtDate(d);
+}
 
-        // 弹窗控制
-        function openAddModal() {
-            document.getElementById('add-modal').classList.add('active');
+function renderResults(tasks) {
+    const titles = { work:'工作', life:'生活', health:'健康', fin:'财务' };
+    const priTitles = { urgent:'🔴 紧急', high:'🟠 高', normal:'🔵 普通', low:'⚪ 低' };
+    const items = document.getElementById('resItems');
+    items.innerHTML = tasks.map(t => `
+        <div class="res-item">
+            <div class="res-item-t">${esc(t.title)}</div>
+            <div class="res-item-m">${titles[t.cat]||'其他'} · ${priTitles[t.pri]||'普通'} ${t.deadline?'· 截止 '+t.deadline:''} ${t.delayed?'· ⚠ 已拖延':''}</div>
+        </div>
+    `).join('');
+
+    // Dynamic message
+    const urgent = tasks.filter(t=>t.pri==='urgent').length;
+    const delayed = tasks.filter(t=>t.delayed).length;
+    const title = document.getElementById('resTitle');
+    const msg = document.getElementById('resMsg');
+    if (urgent > 0) {
+        title.textContent = `发现 ${urgent} 个紧急事项`;
+        msg.textContent = '当前优先级已明确。建议优先处理紧急任务。';
+    } else if (delayed > 0) {
+        title.textContent = '事项已重新归位';
+        msg.textContent = `检测到 ${delayed} 个拖延事项。你的计划系统正在恢复稳定。`;
+    } else {
+        title.textContent = '事项已重新归位';
+        msg.textContent = '你的计划系统正在恢复稳定。';
+    }
+}
+
+function confirmTasks() {
+    if (!pendingTasks.length) return;
+    const tasks = DB.tasks();
+    pendingTasks.forEach(t => {
+        tasks.push({ id:uid(), ...t, done:false, createdAt:new Date().toISOString(), deleted:false, notes:'' });
+    });
+    DB.saveTasks(tasks);
+    pendingTasks = [];
+    document.getElementById('aiInput').value = '';
+    document.getElementById('btnGo').disabled = true;
+    navTo('pg-home');
+}
+
+// ============================
+// VOICE INPUT
+// ============================
+let recognition = null;
+let isRecording = false;
+
+function toggleVoice() {
+    if (isRecording) { stopVoice(); return; }
+    startVoice();
+}
+
+function startVoice() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+        alert('当前浏览器不支持语音识别，请使用文字输入');
+        return;
+    }
+    recognition = new SR();
+    recognition.lang = 'zh-CN';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    let finalTranscript = '';
+    recognition.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
+            else interim += e.results[i][0].transcript;
         }
+        document.getElementById('aiInput').value = finalTranscript + interim;
+        document.getElementById('btnGo').disabled = !finalTranscript && !interim;
+    };
+    recognition.onerror = () => stopVoice();
+    recognition.onend = () => { isRecording = false; updateVoiceBtn(); };
+    recognition.start();
+    isRecording = true;
+    updateVoiceBtn();
+}
 
-        function closeAddModal() {
-            document.getElementById('add-modal').classList.remove('active');
-        }
+function stopVoice() {
+    if (recognition) { recognition.stop(); recognition = null; }
+    isRecording = false;
+    updateVoiceBtn();
+}
 
-        // 保存任务
-        function saveTask() {
-            const name = document.getElementById('task-name').value;
-            const type = document.getElementById('task-type').value;
-            const view = document.getElementById('task-view').value;
-            const startDate = document.getElementById('task-start').value;
-            const endDate = document.getElementById('task-end').value;
-            const hasReminder = document.getElementById('task-reminder').checked;
-            
-            if (!name.trim()) {
-                alert('请输入任务名称');
-                return;
-            }
-            
-            // 创建任务卡片
-            const taskCard = document.createElement('div');
-            taskCard.className = 'task-card animate-slide-in';
-            taskCard.onclick = function() { openTaskDetail(type); };
-            
-            const typeLabels = {
-                'job': '求职',
-                'project': '项目',
-                'travel': '旅游',
-                'exam': '考试',
-                'other': '其他'
-            };
-            
-            const tagClass = {
-                'job': 'tag-job',
-                'project': 'tag-project',
-                'travel': 'tag-travel',
-                'exam': 'tag-exam',
-                'other': 'tag-project'
-            };
-            
-            const now = new Date();
-            const timeStr = `${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
-            taskCard.innerHTML = `
-                <div class="flex items-start justify-between mb-3">
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg">${name}</h3>
-                        <p class="text-sm text-gray-500 mt-1">${startDate || '未设置日期'}</p>
-                    </div>
-                    <span class="task-tag ${tagClass[type] || 'tag-project'}">${typeLabels[type] || '其他'}</span>
-                </div>
-                <div class="progress-bar mb-3">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-                <p class="text-sm text-gray-600">"任务已创建，开始行动吧！"</p>
-                <div class="flex items-center justify-between mt-4">
-                    <span class="text-xs text-gray-400">更新于 刚刚</span>
-                    <button class="text-primary-600 text-sm font-semibold hover:text-primary-700 transition">更新进度</button>
-                </div>
-            `;
-            
-            // 添加到列表顶部
-            const listView = document.querySelector('#list-view');
-            const firstSection = listView.querySelector('.mb-8');
-            if (firstSection) {
-                firstSection.insertBefore(taskCard, firstSection.querySelector('.task-card'));
-            }
-            
-            alert('任务创建成功！\n\n任务名称：' + name + '\n类型：' + typeLabels[type]);
-            closeAddModal();
-            
-            // 清空表单
-            document.getElementById('task-name').value = '';
-            document.getElementById('task-start').value = '';
-            document.getElementById('task-end').value = '';
-            document.getElementById('task-reminder').checked = false;
-        }
+function updateVoiceBtn() {
+    const btn = document.getElementById('btnVoice');
+    if (isRecording) {
+        btn.className = 'btn btn-voice recording';
+        btn.textContent = '⏹ 停止录音';
+    } else {
+        btn.className = 'btn btn-voice';
+        btn.textContent = '🎤 按住说话';
+    }
+    document.getElementById('btnGo').disabled = !document.getElementById('aiInput').value.trim();
+}
 
-        // 点击弹窗外部关闭
-        document.getElementById('add-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeAddModal();
-            }
-        });
+// Auto-enable button on text input
+document.getElementById('aiInput').addEventListener('input', function() {
+    document.getElementById('btnGo').disabled = !this.value.trim();
+});
 
-        // 任务详情页控制
-        function openTaskDetail(type) {
-            const modal = document.getElementById('task-detail-modal');
-            modal.classList.add('active');
-            
-            // 根据任务类型设置不同的封面 emoji
-            const emojis = {
-                'job': '💼',
-                'project': '🚀',
-                'travel': '✈️',
-                'exam': '📚',
-                'other': '📌'
-            };
-            const coverEmoji = document.querySelector('.task-cover .text-7xl');
-            if (coverEmoji && emojis[type]) {
-                coverEmoji.textContent = emojis[type];
-            }
-        }
+// ============================
+// WEEKLY PAGE
+// ============================
+function renderWeekly() {
+    const stats = DB.stats();
+    const tasks = DB.tasks();
+    const now = new Date();
+    const dayOfWeek = now.getDay() || 7;
+    const monday = new Date(now); monday.setDate(now.getDate() - dayOfWeek + 1);
 
-        function closeTaskDetail() {
-            document.getElementById('task-detail-modal').classList.remove('active');
-        }
+    // Week days chart
+    const days = ['一','二','三','四','五','六','日'];
+    const weekDays = document.getElementById('wkDays');
+    let weekTotal = 0, weekDone = 0;
+    weekDays.innerHTML = days.map((d, i) => {
+        const date = new Date(monday); date.setDate(monday.getDate()+i);
+        const ds = fmtDate(date);
+        const done = stats.daily[ds] || 0;
+        const dayTasks = tasks.filter(t => t.date === ds && !t.deleted);
+        const total = dayTasks.length;
+        weekTotal += total;
+        weekDone += dayTasks.filter(t=>t.done).length;
+        const pct = total ? Math.round(done/total*100) : 0;
+        const isToday = ds === todayStr();
+        return `<div class="wd">
+            <div class="wd-l">${d}</div>
+            <div class="wd-bar"><div class="wd-fill ${isToday?'today':''}" style="height:${pct}%"></div></div>
+            <div class="wd-v">${done}/${total}</div>
+        </div>`;
+    }).join('');
 
-        // 添加进度记录
-        function addProgressNote() {
-            const note = document.getElementById('progress-note').value;
-            if (!note.trim()) {
-                alert('请输入记录内容');
-                return;
-            }
-            
-            const timeline = document.querySelector('.space-y-4.max-h-56');
-            const now = new Date();
-            const timeStr = `${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
-            const newRecord = document.createElement('div');
-            newRecord.className = 'flex gap-4 animate-slide-in';
-            newRecord.innerHTML = `
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-lg">✨</div>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm text-gray-800 font-medium">${note}</p>
-                    <p class="text-xs text-gray-500 mt-1">${timeStr}</p>
-                </div>
-            `;
-            
-            timeline.insertBefore(newRecord, timeline.firstChild);
-            document.getElementById('progress-note').value = '';
-        }
+    document.getElementById('wkStreak').textContent = stats.streak || 0;
+    document.getElementById('wkTotal').textContent = weekTotal;
+    document.getElementById('wkDone').textContent = weekDone;
+    document.getElementById('wkRate').textContent = weekTotal ? Math.round(weekDone/weekTotal*100)+'%' : '0%';
+}
 
-        // 皮肤选择
-        document.querySelectorAll('.skin-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.skin-btn').forEach(b => {
-                    b.classList.remove('active', 'border-primary-600');
-                    b.classList.add('border-transparent');
-                });
-                this.classList.add('active', 'border-primary-600');
-                this.classList.remove('border-transparent');
-            });
-        });
+// ============================
+// CELEBRATION
+// ============================
+const celebMsgs = [
+    '你的计划系统正在恢复稳定。',
+    '当前状态：高度有序。',
+    '你的事项已经重新归位。',
+    '节奏感正在回归。继续保持。',
+    '秩序感 +1，掌控感 +1。'
+];
 
-        // 点击任务详情页外部关闭
-        document.getElementById('task-detail-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeTaskDetail();
-            }
-        });
-    </script>
+function showCelebration(stats) {
+    const tasks = DB.tasks();
+    const today = todayStr();
+    const todayTasks = tasks.filter(t => t.date === today && !t.deleted);
+    const done = todayTasks.filter(t=>t.done).length;
+    const total = todayTasks.length;
+    const rate = total ? Math.round(done/total*100) : 0;
+
+    document.getElementById('celTtl').textContent = '秩序值 +10';
+    document.getElementById('celMsg').textContent = celebMsgs[Math.floor(Math.random()*celebMsgs.length)];
+    document.getElementById('celN').textContent = rate + '%';
+    document.getElementById('cele').classList.add('show');
+    setTimeout(() => document.getElementById('cele').classList.remove('show'), 2500);
+}
+
+// ============================
+// UTILITIES
+// ============================
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fmtDate(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function catLabel(c) { return {work:'工作',life:'生活',health:'健康',fin:'财务'}[c]||'其他'; }
+function priLabel(p) { return {urgent:'紧急',high:'高',normal:'普通',low:'低'}[p]||'普通'; }
+function isOverdue(deadline) { return deadline < todayStr(); }
+function fmtDeadline(d) {
+    if (d === todayStr()) return '今天';
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    if (d === fmtDate(tomorrow)) return '明天';
+    if (isOverdue(d)) return '已过期 ' + d;
+    return d;
+}
+function calcStreak(daily) {
+    let s = 0;
+    const d = new Date();
+    while (true) {
+        const ds = fmtDate(d);
+        if (daily[ds] && daily[ds] > 0) { s++; d.setDate(d.getDate()-1); }
+        else break;
+    }
+    return s;
+}
+
+// ============================
+// INIT
+// ============================
+function init() {
+    // Greeting
+    const h = new Date().getHours();
+    const greet = h < 12 ? '早上好' : h < 18 ? '下午好' : '晚上好';
+    document.getElementById('greet').textContent = greet;
+
+    // Date
+    const now = new Date();
+    const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+    document.getElementById('dateStr').textContent =
+        `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${weekdays[now.getDay()]}`;
+
+    renderHome();
+}
+
+init();
+</script>
 </body>
 </html>
