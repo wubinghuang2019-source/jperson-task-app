@@ -5,313 +5,286 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
-    <title>J-Order · 秩序</title>
+    <title>J 人 · 把混乱重新归位</title>
     <style>
         :root {
-            --bg: #F5F5F7;
+            --bg: #FAFAF9;
             --surface: #FFFFFF;
-            --text: #1D1D1F;
-            --text2: #86868B;
-            --text3: #A1A1A6;
-            --accent: #007AFF;
-            --accent2: #5856D6;
-            --green: #34C759;
-            --orange: #FF9500;
-            --red: #FF3B30;
-            --border: #E5E5EA;
-            --card: rgba(255,255,255,0.8);
-            --r: 14px;
+            --surface-2: #F5F5F4;
+            --text: #27272A;
+            --text-2: #78716C;
+            --text-3: #A8A29E;
+            --border: #E7E5E4;
+            --green: #059669;
+            --green-soft: #D1FAE5;
+            --orange: #D97706;
+            --orange-soft: #FEF3C7;
+            --red: #DC2626;
+            --red-soft: #FEE2E2;
+            --black: #18181B;
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
             background: var(--bg); color: var(--text);
             min-height: 100vh; min-height: 100dvh;
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
         }
-        /* Page system */
-        .page { display:none; min-height:100vh; min-height:100dvh; padding-bottom:100px; }
+        .page { display:none; min-height:100vh; padding-bottom:100px; }
         .page.active { display:block; }
-        /* Header */
-        .hdr { padding:56px 20px 12px; }
-        .hdr h1 { font-size:34px; font-weight:700; letter-spacing:-0.5px; }
-        .hdr p { font-size:15px; color:var(--text2); margin-top:4px; }
-        /* Order card */
-        .order-card {
-            margin:16px 20px; padding:24px; background:var(--surface);
-            border-radius:20px; box-shadow:0 1px 4px rgba(0,0,0,0.04);
-            border:1px solid var(--border);
+        .hdr { padding:80px 28px 24px; }
+        .hdr h1 { font-size:28px; font-weight:600; letter-spacing:-0.3px; color:var(--text); }
+        .hdr p { font-size:14px; color:var(--text-3); margin-top:6px; font-weight:400; }
+        .status-card {
+            margin:0 28px 24px; padding:32px 24px;
+            background: var(--surface);
+            border-radius: 20px;
+            border: 1px solid var(--border);
         }
-        .order-top { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
-        .order-dot {
-            width:48px; height:48px; border-radius:50%;
-            display:flex; align-items:center; justify-content:center; font-size:22px;
+        .status-label { font-size:12px; color:var(--text-3); font-weight:500; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:12px; }
+        .status-val { font-size:22px; font-weight:600; color:var(--text); margin-bottom:12px; }
+        .status-msg { font-size:15px; color:var(--text-2); line-height:1.6; }
+        .focus-section { margin:0 28px 32px; }
+        .focus-label { font-size:12px; color:var(--text-3); font-weight:500; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:12px; }
+        .focus-card {
+            padding:20px; background:var(--surface);
+            border-radius:16px; border:1px solid var(--border);
+            display:flex; align-items:flex-start; gap:14px;
         }
-        .order-dot.green { background:#E8F5E9; }
-        .order-dot.orange { background:#FFF3E0; }
-        .order-dot.red { background:#FFEBEE; }
-        .order-label { font-size:13px; color:var(--text2); font-weight:500; text-transform:uppercase; letter-spacing:0.5px; }
-        .order-val { font-size:20px; font-weight:600; margin-top:2px; }
-        .order-msg { font-size:15px; color:var(--text2); line-height:1.6; padding-top:16px; border-top:1px solid var(--border); }
-        .order-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
-        .stat { text-align:center; }
-        .stat-n { font-size:28px; font-weight:700; }
-        .stat-l { font-size:12px; color:var(--text3); margin-top:2px; font-weight:500; }
-        /* Section */
-        .sec { margin-top:28px; padding:0 20px; }
-        .sec-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-        .sec-ttl { font-size:22px; font-weight:600; }
-        .sec-act { font-size:15px; color:var(--accent); font-weight:500; cursor:pointer; }
-        /* Task card */
-        .tasks { display:flex; flex-direction:column; gap:8px; }
-        .task {
-            background:var(--surface); border-radius:var(--r); padding:16px;
-            border:1px solid var(--border); display:flex; align-items:flex-start; gap:14px;
-            cursor:pointer; transition:all 0.2s; position:relative;
+        .focus-dot {
+            width:8px; height:8px; border-radius:50%;
+            background:var(--red); flex-shrink:0; margin-top:6px;
         }
-        .task:active { transform:scale(0.98); }
-        .task.done { opacity:0.45; }
-        .task.done .task-t { text-decoration:line-through; }
-        .task-bar {
-            position:absolute; left:0; top:0; bottom:0; width:4px;
-            border-radius:2px;
-        }
-        .task-bar.urgent { background:var(--red); }
-        .task-bar.high { background:var(--orange); }
-        .task-bar.normal { background:var(--accent); }
-        .task-bar.low { background:var(--text3); }
-        .chk {
-            width:24px; height:24px; border-radius:50%; border:2px solid var(--border);
-            flex-shrink:0; display:flex; align-items:center; justify-content:center;
-            cursor:pointer; transition:all 0.15s; margin-top:1px;
-        }
-        .chk:active { transform:scale(0.85); }
-        .chk.on { background:var(--green); border-color:var(--green); }
-        .chk.on::after { content:'✓'; color:#fff; font-size:14px; font-weight:600; }
-        .task-info { flex:1; min-width:0; }
-        .task-t { font-size:16px; font-weight:500; line-height:1.4; }
-        .task-meta { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
-        .tag {
-            font-size:11px; font-weight:600; padding:3px 8px; border-radius:20px;
-            text-transform:uppercase; letter-spacing:0.3px;
-        }
-        .tag-work { background:#EFF6FF; color:var(--accent); }
-        .tag-life { background:#ECFDF5; color:var(--green); }
-        .tag-health { background:#FFF7ED; color:var(--orange); }
-        .tag-fin { background:#F5F3FF; color:var(--accent2); }
-        .task-time { font-size:12px; color:var(--text3); font-weight:500; }
-        .task-time.overdue { color:var(--red); }
-        .delay-badge { font-size:11px; color:var(--red); font-weight:600; }
-        /* AI page */
-        .ai-pg { display:flex; flex-direction:column; min-height:100vh; min-height:100dvh; }
-        .ai-hdr { padding:56px 20px 20px; text-align:center; }
-        .ai-hdr h2 { font-size:28px; font-weight:700; }
-        .ai-hdr p { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
-        .ai-body { flex:1; padding:20px; display:flex; flex-direction:column; }
-        .ai-ta {
-            width:100%; flex:1; min-height:200px; padding:20px;
-            border:1px solid var(--border); border-radius:20px;
-            font-size:17px; font-family:inherit; line-height:1.6;
-            color:var(--text); background:var(--surface); resize:none; outline:none;
-        }
-        .ai-ta:focus { border-color:var(--accent); }
-        .ai-ta::placeholder { color:var(--text3); }
-        .ai-btns { padding:20px; display:flex; flex-direction:column; gap:12px; }
-        .btn {
-            width:100%; padding:16px; border:none; border-radius:var(--r);
-            font-size:17px; font-weight:600; cursor:pointer; font-family:inherit;
-            transition:all 0.15s;
-        }
-        .btn:active { transform:scale(0.98); }
-        .btn-primary { background:var(--text); color:#fff; }
-        .btn-primary:disabled { opacity:0.35; cursor:not-allowed; }
-        .btn-voice {
-            background:var(--accent); color:#fff;
-            display:flex; align-items:center; justify-content:center; gap:8px;
-        }
-        .btn-voice.recording { animation:pulse 1.5s infinite; background:var(--red); }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
-        .btn-ghost { background:var(--bg); color:var(--text); }
-        /* Result page */
-        .res-hdr { padding:56px 20px 20px; text-align:center; }
-        .res-badge {
-            display:inline-flex; align-items:center; gap:6px;
-            padding:6px 14px; background:#ECFDF5; border-radius:20px;
-            font-size:14px; font-weight:600; color:var(--green); margin-bottom:16px;
-        }
-        .res-hdr h2 { font-size:24px; font-weight:700; }
-        .res-hdr p { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
-        .res-card {
-            margin:20px; padding:20px; background:var(--surface);
-            border-radius:20px; border:1px solid var(--border);
-        }
-        .res-card h4 { font-size:13px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
-        .res-item { padding:12px 0; border-bottom:1px solid var(--border); }
-        .res-item:last-child { border-bottom:none; }
-        .res-item-t { font-size:16px; font-weight:500; }
-        .res-item-m { font-size:13px; color:var(--text2); margin-top:4px; }
-        .res-actions { padding:20px; display:flex; flex-direction:column; gap:12px; }
-        /* Detail page */
-        .det-hdr { padding:56px 20px 12px; }
-        .det-back { font-size:17px; color:var(--accent); font-weight:500; cursor:pointer; }
-        .det-body { padding:0 20px 20px; }
-        .det-ttl { font-size:28px; font-weight:700; line-height:1.3; }
-        .det-meta { margin-top:20px; background:var(--surface); border-radius:20px; border:1px solid var(--border); overflow:hidden; }
-        .det-row { display:flex; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
-        .det-row:last-child { border-bottom:none; }
-        .det-lbl { font-size:15px; color:var(--text2); }
-        .det-val { font-size:15px; font-weight:500; }
-        .det-notes { margin-top:20px; }
-        .det-notes h4 { font-size:13px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
-        .det-ta {
-            width:100%; min-height:100px; padding:16px; border:1px solid var(--border);
-            border-radius:var(--r); font-size:15px; font-family:inherit; line-height:1.5;
-            color:var(--text); background:var(--surface); resize:none; outline:none;
-        }
-        .det-ta:focus { border-color:var(--accent); }
-        /* Weekly page */
-        .week-card { margin:16px 20px; padding:24px; background:var(--surface); border-radius:20px; border:1px solid var(--border); }
-        .week-days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:16px; }
-        .wd { text-align:center; }
-        .wd-l { font-size:11px; color:var(--text3); font-weight:500; margin-bottom:6px; }
-        .wd-bar { height:56px; background:var(--bg); border-radius:8px; position:relative; overflow:hidden; }
-        .wd-fill { position:absolute; bottom:0; left:0; right:0; background:var(--accent); border-radius:8px; transition:height 0.4s; }
-        .wd-fill.today { background:var(--green); }
-        .wd-v { font-size:11px; color:var(--text2); margin-top:4px; font-weight:600; }
-        .streak-card {
-            margin:16px 20px; padding:24px;
-            background:linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
-            border-radius:20px; color:#fff;
-        }
-        .streak-n { font-size:48px; font-weight:700; }
-        .streak-l { font-size:15px; opacity:0.8; margin-top:4px; }
-        /* Bottom nav */
+        .focus-info { flex:1; }
+        .focus-t { font-size:16px; font-weight:500; line-height:1.5; color:var(--text); }
+        .focus-m { font-size:13px; color:var(--text-3); margin-top:6px; }
+        .empty { text-align:center; padding:64px 28px; }
+        .empty-emoji { font-size:18px; color:var(--text-3); margin-bottom:12px; font-weight:400; }
+        .empty-ttl { font-size:15px; font-weight:500; color:var(--text-2); }
+        .empty-msg { font-size:14px; color:var(--text-3); margin-top:8px; line-height:1.6; }
         .bnav {
             position:fixed; bottom:0; left:0; right:0;
-            background:rgba(255,255,255,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-            border-top:1px solid var(--border); display:flex; justify-content:space-around;
-            padding:8px 0; padding-bottom:max(8px, var(--safe-bottom)); z-index:100;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top:1px solid var(--border);
+            display:flex; justify-content:space-around;
+            padding:12px 0; padding-bottom:max(12px, var(--safe-bottom));
+            z-index:100;
         }
         .bnav-item {
-            display:flex; flex-direction:column; align-items:center; gap:2px;
-            padding:6px 16px; cursor:pointer; border-radius:12px;
+            display:flex; flex-direction:column; align-items:center; gap:4px;
+            padding:8px 24px; cursor:pointer;
         }
-        .bnav-item:active { background:var(--bg); }
-        .bnav-icon { font-size:24px; }
-        .bnav-lbl { font-size:10px; font-weight:500; color:var(--text3); }
-        .bnav-item.active .bnav-lbl { color:var(--accent); font-weight:600; }
-        /* FAB */
-        .fab {
-            position:fixed; bottom:90px; right:20px; width:56px; height:56px;
-            border-radius:50%; background:var(--accent); color:#fff; border:none;
-            font-size:28px; cursor:pointer; box-shadow:0 4px 16px rgba(0,122,255,0.3);
-            display:flex; align-items:center; justify-content:center; transition:all 0.15s; z-index:99;
+        .bnav-item:active { opacity:0.6; }
+        .bnav-icon { width:24px; height:24px; }
+        .bnav-icon svg { width:100%; height:100%; }
+        .bnav-lbl { font-size:11px; font-weight:500; color:var(--text-3); }
+        .bnav-item.active .bnav-lbl { color:var(--text); font-weight:600; }
+        .center-btn-container {
+            position:fixed; bottom:calc(100px + var(--safe-bottom)); left:0; right:0;
+            display:flex; justify-content:center;
+            z-index:101;
+            pointer-events:none;
         }
-        .fab:active { transform:scale(0.9); }
-        /* Celebration */
-        .cele {
-            position:fixed; inset:0; background:rgba(0,0,0,0.45);
-            display:none; align-items:center; justify-content:center; z-index:1000;
+        .center-btn {
+            pointer-events:auto;
+            display:flex; align-items:center; gap:8px;
+            padding:14px 24px;
+            background: var(--black); color: #fff;
+            border-radius: 30px;
+            font-size:15px; font-weight:500;
+            cursor:pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transition: all 0.2s;
         }
+        .center-btn:active { transform:scale(0.96); }
+        .center-btn svg { width:18px; height:18px; }
+        .ai-pg { display:flex; flex-direction:column; min-height:100vh; }
+        .ai-hdr { padding:80px 28px 32px; text-align:center; }
+        .ai-hdr h2 { font-size:24px; font-weight:600; color:var(--text); margin-bottom:8px; }
+        .ai-hdr p { font-size:15px; color:var(--text-2); line-height:1.6; }
+        .ai-body { flex:1; padding:0 28px 28px; }
+        .ai-ta {
+            width:100%; min-height:200px; padding:0;
+            border:none; border-bottom:1px solid var(--border);
+            font-size:17px; font-family:inherit; line-height:1.7;
+            color:var(--text); background:transparent; resize:none; outline:none;
+        }
+        .ai-ta::placeholder { color:var(--text-3); }
+        .ai-actions { padding:0 28px 28px; display:flex; flex-direction:column; gap:12px; }
+        .btn {
+            width:100%; padding:16px; border:none; border-radius:14px;
+            font-size:16px; font-weight:500; cursor:pointer; font-family:inherit;
+        }
+        .btn:active { transform:scale(0.98); }
+        .btn-primary { background:var(--black); color:#fff; }
+        .btn-primary:disabled { opacity:0.3; cursor:not-allowed; }
+        .btn-voice {
+            background:var(--surface); color:var(--text);
+            border:1px solid var(--border);
+            display:flex; align-items:center; justify-content:center; gap:8px;
+        }
+        .btn-voice svg { width:18px; height:18px; flex-shrink:0; }
+        .btn-voice.recording { animation: pulse 1.5s infinite; background: var(--red-soft); color: var(--red); border-color: var(--red); }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        .result-pg { display:flex; flex-direction:column; min-height:100vh; }
+        .result-hdr { padding:80px 28px 24px; text-align:center; }
+        .result-hdr h2 { font-size:22px; font-weight:600; color:var(--text); margin-bottom:8px; }
+        .result-hdr p { font-size:15px; color:var(--text-2); line-height:1.6; }
+        .result-body { flex:1; padding:0 28px 28px; }
+        .result-group { margin-bottom:24px; }
+        .result-group-label {
+            font-size:12px; color:var(--text-3); font-weight:500;
+            letter-spacing:0.5px; text-transform:uppercase;
+            padding:8px 0; border-bottom:1px solid var(--border);
+            margin-bottom:12px;
+        }
+        .result-item { padding:16px 0; border-bottom:1px solid var(--border); }
+        .result-item:last-child { border-bottom:none; }
+        .result-item-t { font-size:15px; font-weight:500; color:var(--text); margin-bottom:6px; }
+        .result-item-s { font-size:13px; color:var(--text-2); line-height:1.5; }
+        .result-status {
+            margin-top:24px; padding:20px;
+            background:var(--surface-2); border-radius:14px;
+            text-align:center;
+        }
+        .result-status-l { font-size:12px; color:var(--text-3); margin-bottom:6px; }
+        .result-status-v { font-size:16px; font-weight:500; color:var(--text); }
+        .result-actions { padding:28px; display:flex; flex-direction:column; gap:12px; }
+        .profile-hdr { padding:80px 28px 24px; }
+        .profile-avatar {
+            width:56px; height:56px; border-radius:50%;
+            background: var(--black); color: #fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:22px; font-weight:600; margin-bottom:16px;
+        }
+        .profile-name { font-size:20px; font-weight:600; }
+        .profile-tag { font-size:13px; color:var(--text-2); margin-top:6px; line-height:1.5; }
+        .section-card { margin:24px 28px; padding:24px; background:var(--surface); border-radius:18px; border:1px solid var(--border); }
+        .section-card h3 { font-size:15px; font-weight:600; margin-bottom:20px; color:var(--text); }
+        .streak-card {
+            margin:24px 28px; padding:32px 24px;
+            background: linear-gradient(135deg, #27272A 0%, #3F3F46 100%);
+            border-radius:20px; color:#fff;
+        }
+        .streak-n { font-size:42px; font-weight:700; letter-spacing:-1px; }
+        .streak-l { font-size:14px; opacity:0.8; margin-top:6px; }
+        .streak-msg { font-size:13px; opacity:0.7; margin-top:14px; line-height:1.5; }
+        .week-days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:16px; }
+        .wd { text-align:center; }
+        .wd-l { font-size:10px; color:var(--text-3); font-weight:500; margin-bottom:6px; }
+        .wd-bar { height:42px; background:var(--surface-2); border-radius:8px; position:relative; overflow:hidden; }
+        .wd-fill { position:absolute; bottom:0; left:0; right:0; background:var(--black); border-radius:8px; transition:height 0.4s; }
+        .wd-fill.today { background:var(--green); }
+        .wd-v { font-size:10px; color:var(--text-2); margin-top:4px; font-weight:500; }
+        .history-list { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+        .history-item { padding:14px; background:var(--surface-2); border-radius:12px; display:flex; align-items:center; gap:12px; }
+        .history-check { width:18px; height:18px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:600; }
+        .history-info { flex:1; }
+        .history-t { font-size:14px; font-weight:500; color:var(--text); }
+        .history-d { font-size:11px; color:var(--text-3); margin-top:2px; }
+        .cele { position:fixed; inset:0; background: rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:1000; }
         .cele.show { display:flex; }
         .cele-box {
-            background:var(--surface); border-radius:20px; padding:40px 32px;
-            text-align:center; max-width:300px;
-            animation:scaleIn 0.35s cubic-bezier(0.16,1,0.3,1);
+            background:var(--surface); border-radius:20px;
+            padding:36px 28px; text-align:center;
+            max-width:280px; margin:24px;
+            animation: scaleIn 0.35s cubic-bezier(0.16,1,0.3,1);
         }
-        .cele-emoji { font-size:56px; margin-bottom:12px; }
-        .cele-ttl { font-size:22px; font-weight:700; }
-        .cele-msg { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
-        .cele-stat { margin-top:20px; padding:16px; background:var(--bg); border-radius:var(--r); }
-        .cele-stat-n { font-size:32px; font-weight:700; color:var(--green); }
-        .cele-stat-l { font-size:13px; color:var(--text2); margin-top:2px; }
+        .cele-emoji { font-size:42px; margin-bottom:14px; }
+        .cele-ttl { font-size:18px; font-weight:600; color:var(--text); }
+        .cele-msg { font-size:14px; color:var(--text-2); margin-top:10px; line-height:1.5; }
+        .cele-stat { margin-top:20px; padding:14px; background:var(--surface-2); border-radius:12px; }
+        .cele-stat-n { font-size:26px; font-weight:700; color:var(--green); }
+        .cele-stat-l { font-size:12px; color:var(--text-3); margin-top:2px; }
         @keyframes scaleIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
-        @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        .slide-up { animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1); }
-        /* Empty state */
-        .empty { text-align:center; padding:48px 20px; }
-        .empty-emoji { font-size:48px; margin-bottom:12px; }
-        .empty-ttl { font-size:18px; font-weight:600; }
-        .empty-msg { font-size:15px; color:var(--text2); margin-top:8px; line-height:1.5; }
-        /* Loading */
-        .loading { display:flex; align-items:center; justify-content:center; padding:48px; }
-        .spinner {
-            width:28px; height:28px; border:3px solid var(--border);
-            border-top-color:var(--accent); border-radius:50%;
-            animation:spin 0.7s linear infinite;
-        }
-        @keyframes spin { to{transform:rotate(360deg)} }
+        .task-complete-anim { animation: fadeOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fadeOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.95); } }
+        .det-hdr { padding:80px 28px 16px; }
+        .det-back { font-size:15px; color:var(--text-2); font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+        .det-body { padding:0 28px 24px; }
+        .det-ttl { font-size:24px; font-weight:600; line-height:1.3; }
+        .det-meta { margin-top:24px; background:var(--surface); border-radius:16px; border:1px solid var(--border); overflow:hidden; }
+        .det-row { display:flex; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+        .det-row:last-child { border-bottom:none; }
+        .det-lbl { font-size:13px; color:var(--text-3); }
+        .det-val { font-size:13px; font-weight:500; color:var(--text); }
+        .det-notes { margin-top:24px; }
+        .det-notes h4 { font-size:11px; color:var(--text-3); font-weight:500; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px; }
+        .det-ta { width:100%; min-height:80px; padding:14px; border:1px solid var(--border); border-radius:12px; font-size:14px; font-family:inherit; color:var(--text); background:var(--surface); resize:none; outline:none; }
+        .slide-up { animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     </style>
 </head>
 <body>
-
-<!-- ============ PAGE: 首页 · 今日秩序 ============ -->
 <div id="pg-home" class="page active">
     <div class="hdr">
-        <h1 id="greet">早上好</h1>
+        <h1 id="greet">下午好</h1>
         <p id="dateStr"></p>
     </div>
-    <div class="order-card slide-up">
-        <div class="order-top">
-            <div class="order-dot orange" id="oDot">⚡</div>
-            <div>
-                <div class="order-label">秩序值</div>
-                <div class="order-val" id="oVal">秩序正在恢复中</div>
+    <div class="status-card slide-up">
+        <div class="status-label">当前状态</div>
+        <div class="status-val" id="statusVal">当前节奏良好</div>
+        <div class="status-msg" id="statusMsg">今天暂未出现新的混乱。当前事项已经重新归位。</div>
+    </div>
+    <div class="focus-section slide-up" id="focusSection">
+        <div class="focus-label">今日重点</div>
+        <div class="focus-card" id="focusCard">
+            <div class="focus-dot"></div>
+            <div class="focus-info">
+                <div class="focus-t" id="focusTitle">暂无重点事项</div>
+                <div class="focus-m" id="focusMeta">点击底部「倒出来」开始归位</div>
             </div>
         </div>
-        <div class="order-msg" id="oMsg">你的事项已经重新归位。当前优先级已明确。</div>
-        <div class="order-stats">
-            <div class="stat"><div class="stat-n" id="sTotal">0</div><div class="stat-l">待办</div></div>
-            <div class="stat"><div class="stat-n" id="sDone">0</div><div class="stat-l">已完成</div></div>
-            <div class="stat"><div class="stat-n" id="sRate">0%</div><div class="stat-l">完成率</div></div>
-        </div>
     </div>
-    <div class="sec">
-        <div class="sec-hdr">
-            <div class="sec-ttl">今日任务</div>
-            <div class="sec-act" onclick="navTo('pg-ai')">+ AI 整理</div>
-        </div>
-        <div class="tasks" id="taskList"></div>
+    <div class="empty" id="emptyState" style="display:none;">
+        <div class="empty-emoji">—</div>
+        <div class="empty-ttl">今天暂未出现新的混乱</div>
+        <div class="empty-msg">把脑子里的事情倒出来<br>我来帮你重新归位</div>
     </div>
 </div>
-
-<!-- ============ PAGE: AI 语音输入 ============ -->
-<div id="pg-ai" class="page">
+<div class="center-btn-container" id="centerBtnContainer">
+    <div class="center-btn" onclick="navTo('pg-dump')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        倒出来
+    </div>
+</div>
+<div id="pg-dump" class="page">
     <div class="ai-pg">
         <div class="ai-hdr">
-            <h2>AI 秩序整理</h2>
-            <p>把脑子里的所有事情倒出来<br>AI 帮你自动分类、排序、安排</p>
+            <h2>把混乱重新归位</h2>
+            <p>所有在你脑子里的事情<br>我来帮你分类、排序、安排</p>
         </div>
         <div class="ai-body">
             <textarea class="ai-ta" id="aiInput" placeholder="例如：周三要交方案，然后提醒我买猫粮，还有月底续签证，健身也已经拖了三天了..."></textarea>
         </div>
-        <div class="ai-btns">
-            <button class="btn btn-voice" id="btnVoice" onclick="toggleVoice()">🎤 按住说话</button>
-            <button class="btn btn-primary" id="btnGo" onclick="doAnalyze()" disabled>✨ 开始整理</button>
+        <div class="ai-actions">
+            <button class="btn btn-voice" id="btnVoice" onclick="toggleVoice()">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                按住说话
+            </button>
+            <button class="btn btn-primary" id="btnGo" onclick="doAnalyze()" disabled>✨ 开始归位</button>
         </div>
     </div>
 </div>
-
-<!-- ============ PAGE: AI 整理结果 ============ -->
 <div id="pg-result" class="page">
-    <div class="res-hdr">
-        <div class="res-badge">✓ 整理完成</div>
-        <h2 id="resTitle">事项已重新归位</h2>
-        <p id="resMsg">你的计划系统正在恢复稳定。</p>
-    </div>
-    <div class="res-card slide-up">
-        <h4>AI 提取结果</h4>
-        <div id="resItems"></div>
-    </div>
-    <div class="res-actions">
-        <button class="btn btn-primary" onclick="confirmTasks()">✓ 确认添加任务</button>
-        <button class="btn btn-ghost" onclick="navTo('pg-home')">返回首页</button>
+    <div class="result-pg">
+        <div class="result-hdr">
+            <h2 id="resTitle">今日已重新归位</h2>
+            <p id="resMsg">你的计划系统正在恢复稳定。</p>
+        </div>
+        <div class="result-body" id="resBody"></div>
+        <div class="result-status slide-up">
+            <div class="result-status-l">当前节奏</div>
+            <div class="result-status-v" id="resStatus">正在恢复稳定</div>
+        </div>
+        <div class="result-actions">
+            <button class="btn btn-primary" onclick="confirmTasks()">✓ 确认添加</button>
+            <button class="btn" style="background:var(--surface);color:var(--text);border:1px solid var(--border)" onclick="navTo('pg-home')">返回首页</button>
+        </div>
     </div>
 </div>
-
-<!-- ============ PAGE: 任务详情 ============ -->
 <div id="pg-detail" class="page">
     <div class="det-hdr"><div class="det-back" onclick="navTo('pg-home')">← 返回</div></div>
     <div class="det-body">
@@ -328,57 +301,63 @@
         </div>
     </div>
 </div>
-
-<!-- ============ PAGE: 本周进度 ============ -->
-<div id="pg-weekly" class="page">
-    <div class="hdr">
-        <h1>本周进度</h1>
-        <p>你的秩序恢复情况</p>
+<div id="pg-profile" class="page">
+    <div class="profile-hdr">
+        <div class="profile-avatar">J</div>
+        <div class="profile-name">J 人</div>
+        <div class="profile-tag">专为 J 型人格设计的人生秩序系统</div>
     </div>
     <div class="streak-card slide-up">
-        <div class="streak-n" id="wkStreak">0</div>
+        <div class="streak-n" id="pStreak">0</div>
         <div class="streak-l">连续执行天数</div>
+        <div class="streak-msg" id="pStreakMsg">保持节奏，秩序感正在累积。</div>
     </div>
-    <div class="week-card slide-up">
-        <div class="sec-ttl">每日完成情况</div>
-        <div class="week-days" id="wkDays"></div>
-    </div>
-    <div class="order-card slide-up">
-        <div class="order-stats">
-            <div class="stat"><div class="stat-n" id="wkTotal">0</div><div class="stat-l">本周任务</div></div>
-            <div class="stat"><div class="stat-n" id="wkDone">0</div><div class="stat-l">已完成</div></div>
-            <div class="stat"><div class="stat-n" id="wkRate">0%</div><div class="stat-l">完成率</div></div>
+    <div class="section-card slide-up">
+        <h3>本周秩序</h3>
+        <div class="week-days" id="pWeekDays"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;">
+            <div class="stat"><div class="stat-n" id="pWeekTotal">0</div><div class="stat-l" style="font-size:10px;color:var(--text-3)">本周事项</div></div>
+            <div class="stat"><div class="stat-n" id="pWeekDone">0</div><div class="stat-l" style="font-size:10px;color:var(--text-3)">已推进</div></div>
+            <div class="stat"><div class="stat-n" id="pWeekRate">0%</div><div class="stat-l" style="font-size:10px;color:var(--text-3)">完成率</div></div>
         </div>
     </div>
+    <div class="section-card slide-up">
+        <h3>历史归档</h3>
+        <div class="history-list" id="pHistory"></div>
+    </div>
 </div>
-
-<!-- ============ CELEBRATION ============ -->
 <div class="cele" id="cele" onclick="this.classList.remove('show')">
     <div class="cele-box">
-        <div class="cele-emoji">🎯</div>
-        <div class="cele-ttl" id="celTtl">秩序值 +10</div>
-        <div class="cele-msg" id="celMsg">你的计划系统正在恢复稳定。</div>
+        <div class="cele-emoji">✓</div>
+        <div class="cele-ttl" id="celTtl">事项已推进</div>
+        <div class="cele-msg" id="celMsg">当前状态：恢复稳定</div>
         <div class="cele-stat">
             <div class="cele-stat-n" id="celN">75%</div>
-            <div class="cele-stat-l">当前完成率</div>
+            <div class="cele-stat-l">今日完成率</div>
         </div>
     </div>
 </div>
-
-<!-- ============ BOTTOM NAV ============ -->
-<div class="bnav" id="bnav">
-    <div class="bnav-item active" onclick="navTo('pg-home')"><span class="bnav-icon">🏠</span><span class="bnav-lbl">今日</span></div>
-    <div class="bnav-item" onclick="navTo('pg-ai')"><span class="bnav-icon">🎤</span><span class="bnav-lbl">AI 整理</span></div>
-    <div class="bnav-item" onclick="navTo('pg-weekly')"><span class="bnav-icon">📊</span><span class="bnav-lbl">本周</span></div>
+<div class="bnav">
+    <div class="bnav-item active" onclick="navTo('pg-home')">
+        <div class="bnav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span class="bnav-lbl">今日</span>
+    </div>
+    <div class="bnav-item" onclick="navTo('pg-dump')">
+        <div class="bnav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <span class="bnav-lbl">倒出来</span>
+    </div>
+    <div class="bnav-item" onclick="navTo('pg-profile')">
+        <div class="bnav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        </div>
+        <span class="bnav-lbl">我的</span>
+    </div>
 </div>
-
-<!-- ============ FAB ============ -->
-<button class="fab" id="fab" onclick="navTo('pg-ai')">+</button>
-
 <script>
-// ============================
-// DATA LAYER (localStorage)
-// ============================
 const DB = {
     get(key, def) { try { return JSON.parse(localStorage.getItem('jorder_'+key)) || def; } catch { return def; } },
     set(key, val) { localStorage.setItem('jorder_'+key, JSON.stringify(val)); },
@@ -387,32 +366,17 @@ const DB = {
     stats() { return this.get('stats', { streak:0, daily:{}, totalDone:0 }); },
     saveStats(s) { this.set('stats', s); }
 };
-
-let pendingTasks = []; // AI 解析后待确认的任务
-
-// ============================
-// NAVIGATION
-// ============================
+let pendingTasks = [];
 function navTo(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
-    // Update nav
-    const tabs = ['pg-home','pg-ai','pg-weekly'];
+    const tabs = ['pg-home','pg-dump','pg-profile'];
     const idx = tabs.indexOf(pageId);
-    document.querySelectorAll('.bnav-item').forEach((n,i) => {
-        n.classList.toggle('active', i === idx);
-    });
-    // FAB visibility
-    document.getElementById('fab').style.display = (pageId === 'pg-home') ? 'flex' : 'none';
-    // Page-specific init
+    document.querySelectorAll('.bnav-item').forEach((n,i) => n.classList.toggle('active', i === idx));
     if (pageId === 'pg-home') renderHome();
-    if (pageId === 'pg-weekly') renderWeekly();
+    if (pageId === 'pg-profile') renderProfile();
     window.scrollTo(0,0);
 }
-
-// ============================
-// HOME PAGE
-// ============================
 function renderHome() {
     const tasks = DB.tasks();
     const today = todayStr();
@@ -420,167 +384,109 @@ function renderHome() {
     const done = todayTasks.filter(t => t.done).length;
     const total = todayTasks.length;
     const rate = total ? Math.round(done/total*100) : 0;
-
-    // Stats
-    document.getElementById('sTotal').textContent = total - done;
-    document.getElementById('sDone').textContent = done;
-    document.getElementById('sRate').textContent = rate + '%';
-
-    // Order status
-    const oDot = document.getElementById('oDot');
-    const oVal = document.getElementById('oVal');
-    const oMsg = document.getElementById('oMsg');
+    const statusVal = document.getElementById('statusVal');
+    const statusMsg = document.getElementById('statusMsg');
     if (rate >= 80) {
-        oDot.className = 'order-dot green'; oDot.textContent = '✓';
-        oVal.textContent = '高度有序';
-        oMsg.textContent = '你的事项已经重新归位。当前状态：高度有序。继续保持。';
+        statusVal.textContent = '高度稳定';
+        statusMsg.textContent = '你的事项已经重新归位。今天暂未出现新的混乱。';
     } else if (rate >= 40) {
-        oDot.className = 'order-dot orange'; oDot.textContent = '⚡';
-        oVal.textContent = '秩序正在恢复中';
-        oMsg.textContent = '你的计划系统正在恢复稳定。当前优先级已明确。';
+        statusVal.textContent = '正在恢复秩序';
+        statusMsg.textContent = '当前优先级已明确。按顺序推进即可。';
     } else if (total > 0) {
-        oDot.className = 'order-dot red'; oDot.textContent = '⚠';
-        oVal.textContent = '需要关注';
-        oMsg.textContent = '检测到任务堆积。建议优先处理高优先级事项。';
+        statusVal.textContent = '存在轻微积压';
+        statusMsg.textContent = '建议先处理下方重点事项，重新找回掌控感。';
     } else {
-        oDot.className = 'order-dot orange'; oDot.textContent = '⚡';
-        oVal.textContent = '暂无任务';
-        oMsg.textContent = '使用 AI 整理，把脑子里的事情倒出来。';
+        statusVal.textContent = '当前节奏良好';
+        statusMsg.textContent = '今天暂未出现新的混乱。把脑子里的事情倒出来，我来帮你归位。';
     }
-
-    // Task list
-    const list = document.getElementById('taskList');
-    if (todayTasks.length === 0) {
-        list.innerHTML = `<div class="empty"><div class="empty-emoji">📝</div><div class="empty-ttl">暂无今日任务</div><div class="empty-msg">点击右下角 + 使用 AI 整理<br>或直接添加任务</div></div>`;
-        return;
+    const focusSection = document.getElementById('focusSection');
+    const emptyState = document.getElementById('emptyState');
+    if (total === 0) {
+        focusSection.style.display = 'none';
+        emptyState.style.display = 'block';
+    } else {
+        focusSection.style.display = 'block';
+        emptyState.style.display = 'none';
+        const priOrder = { urgent:0, high:1, normal:2, low:3 };
+        const undone = todayTasks.filter(t => !t.done).sort((a,b) => (priOrder[a.pri]||2) - (priOrder[b.pri]||2));
+        if (undone.length === 0) {
+            document.getElementById('focusTitle').textContent = '今日事项已全部推进';
+            document.getElementById('focusMeta').textContent = '继续保持这个节奏';
+            document.querySelector('.focus-dot').style.background = 'var(--green)';
+        } else {
+            const focus = undone[0];
+            document.getElementById('focusTitle').textContent = focus.title;
+            const catNames = {work:'工作',life:'生活',health:'健康',fin:'财务'};
+            const priNames = {urgent:'紧急',high:'重要',normal:'普通',low:'低'};
+            let meta = `${catNames[focus.cat]||'其他'} · ${priNames[focus.pri]||'普通'}`;
+            if (focus.deadline) meta += ` · 截止 ${fmtDeadline(focus.deadline)}`;
+            document.getElementById('focusMeta').textContent = meta;
+            const dotColors = {urgent:'var(--red)',high:'var(--orange)',normal:'var(--text-3)',low:'var(--text-3)'};
+            document.querySelector('.focus-dot').style.background = dotColors[focus.pri]||'var(--text-3)';
+        }
     }
-    // Sort: undone first, then by priority
-    const priOrder = { urgent:0, high:1, normal:2, low:3 };
-    todayTasks.sort((a,b) => {
-        if (a.done !== b.done) return a.done ? 1 : -1;
-        return (priOrder[a.pri]||2) - (priOrder[b.pri]||2);
-    });
-    list.innerHTML = todayTasks.map(t => `
-        <div class="task ${t.done?'done':''}" onclick="openDetail('${t.id}')">
-            <div class="task-bar ${t.pri}"></div>
-            <div class="chk ${t.done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div>
-            <div class="task-info">
-                <div class="task-t">${esc(t.title)}</div>
-                <div class="task-meta">
-                    <span class="tag tag-${t.cat||'work'}">${catLabel(t.cat)}</span>
-                    ${t.deadline ? `<span class="task-time ${isOverdue(t.deadline)?'overdue':''}">${fmtDeadline(t.deadline)}</span>` : ''}
-                    ${t.delayed ? '<span class="delay-badge">⚠ 已拖延</span>' : ''}
-                </div>
-            </div>
-        </div>
-    `).join('');
 }
-
-// ============================
-// TASK CRUD
-// ============================
-function toggleDone(id) {
-    const tasks = DB.tasks();
-    const t = tasks.find(x => x.id === id);
-    if (!t) return;
+function completeTask(id, t, tasks) {
     const wasDone = t.done;
     t.done = !t.done;
     t.doneAt = t.done ? new Date().toISOString() : null;
     DB.saveTasks(tasks);
-
-    // Update stats
     const stats = DB.stats();
     const today = todayStr();
     if (!stats.daily[today]) stats.daily[today] = 0;
     if (t.done) stats.daily[today]++;
     else stats.daily[today] = Math.max(0, stats.daily[today]-1);
     stats.totalDone = Object.values(stats.daily).reduce((a,b)=>a+b,0);
-    // Streak
     stats.streak = calcStreak(stats.daily);
     DB.saveStats(stats);
-
     if (t.done && !wasDone) showCelebration(stats);
     renderHome();
 }
-
-function openDetail(id) {
-    const tasks = DB.tasks();
-    const t = tasks.find(x => x.id === id);
-    if (!t) return;
-    document.getElementById('dTitle').textContent = t.title;
-    document.getElementById('dCat').textContent = catLabel(t.cat);
-    document.getElementById('dPri').textContent = priLabel(t.pri);
-    document.getElementById('dDead').textContent = t.deadline || '未设置';
-    document.getElementById('dStatus').textContent = t.done ? '已完成' : '进行中';
-    document.getElementById('dNotes').value = t.notes || '';
-    navTo('pg-detail');
-}
-
-function addTask(t) {
-    const tasks = DB.tasks();
-    tasks.push({ id: uid(), ...t, done:false, createdAt: new Date().toISOString(), deleted:false });
-    DB.saveTasks(tasks);
-}
-
-// ============================
-// AI ANALYSIS (local fallback)
-// ============================
 function doAnalyze() {
     const text = document.getElementById('aiInput').value.trim();
     if (!text) return;
-    // Show loading
     const btn = document.getElementById('btnGo');
     btn.disabled = true;
-    btn.textContent = '⏳ AI 分析中...';
-
-    // Use local AI parser (in production, call DashScope API)
+    btn.textContent = '⏳ 分析中...';
     setTimeout(() => {
         pendingTasks = parseBrainDump(text);
         renderResults(pendingTasks);
         btn.disabled = false;
-        btn.textContent = '✨ 开始整理';
+        btn.textContent = '✨ 开始归位';
         navTo('pg-result');
     }, 800);
 }
-
 function parseBrainDump(text) {
-    // Split by common delimiters
     const segments = text.split(/[，,、;；。\n]+/).map(s=>s.trim()).filter(s=>s.length>0);
     const tasks = [];
     const now = new Date();
-
     segments.forEach(seg => {
         if (seg.length < 2) return;
         const cat = detectCat(seg);
         const pri = detectPri(seg);
         const deadline = detectDate(seg, now);
-        const delayed = /拖|落后|应该早|还没|已经.*了/.test(seg);
-
+        const delayed = /拖 | 落后 | 应该早 | 还没 | 已经.*了/.test(seg);
         tasks.push({
-            title: seg.replace(/^(然后|还有|另外|再|对了|对了还有)\s*/g,''),
+            title: seg.replace(/^(然后 | 还有 | 另外 | 再 | 对了 | 对了还有)\s*/g,''),
             cat, pri, deadline, delayed,
             date: todayStr()
         });
     });
-
     return tasks;
 }
-
 function detectCat(text) {
-    if (/面试|工作|简历|方案|项目|客户|汇报|会议|产品|代码|bug|需求/.test(text)) return 'work';
-    if (/猫粮|狗粮|买菜|快递|缴费|洗衣|打扫|取件|寄快递|预约/.test(text)) return 'life';
-    if (/健身|运动|跑步|游泳|体检|看病|减肥|瑜伽|复诊|疫苗/.test(text)) return 'health';
-    if (/签证|续|银行|缴费|账单|报税|保险|投资|转账|退款/.test(text)) return 'fin';
+    if (/面试 | 工作 | 简历 | 方案 | 项目 | 客户 | 汇报 | 会议 | 产品 | 代码|bug|需求/.test(text)) return 'work';
+    if (/猫粮 | 狗粮 | 买菜 | 快递 | 缴费 | 洗衣 | 打扫 | 取件 | 寄快递 | 预约/.test(text)) return 'life';
+    if (/健身 | 运动 | 跑步 | 游泳 | 体检 | 看病 | 减肥 | 瑜伽 | 复诊 | 疫苗/.test(text)) return 'health';
+    if (/签证 | 续 | 银行 | 缴费 | 账单 | 报税 | 保险 | 投资 | 转账 | 退款/.test(text)) return 'fin';
     return 'work';
 }
-
 function detectPri(text) {
-    if (/紧急|必须|马上|立刻|今天|今天一定|deadline|截止/.test(text)) return 'urgent';
-    if (/重要|优先|周三|周四|这周|明天/.test(text)) return 'high';
-    if (/月底|下周|慢慢|有空|有空再|不急/.test(text)) return 'low';
+    if (/紧急 | 必须 | 马上 | 立刻 | 今天 | 今天一定|deadline|截止/.test(text)) return 'urgent';
+    if (/重要 | 优先 | 周三 | 周四 | 这周 | 明天/.test(text)) return 'high';
+    if (/月底 | 下周 | 慢慢 | 有空 | 有空再 | 不急/.test(text)) return 'low';
     return 'normal';
 }
-
 function detectDate(text, now) {
     const dayMap = { '今天':0, '明天':1, '后天':2 };
     for (const [word, offset] of Object.entries(dayMap)) {
@@ -592,21 +498,12 @@ function detectDate(text, now) {
     if (/周三/.test(text)) return nextWeekday(3, now);
     if (/周四/.test(text)) return nextWeekday(4, now);
     if (/周五/.test(text)) return nextWeekday(5, now);
-    if (/周一|周一/.test(text)) return nextWeekday(1, now);
+    if (/周一 | 周一/.test(text)) return nextWeekday(1, now);
     if (/周末/.test(text)) return nextWeekday(6, now);
     if (/月底/.test(text)) {
         const d = new Date(now.getFullYear(), now.getMonth()+1, 0);
         return fmtDate(d);
     }
-    if (/这周/.test(text)) {
-        const d = new Date(now); d.setDate(d.getDate() + (5 - d.getDay()));
-        return fmtDate(d);
-    }
-    if (/下周/.test(text)) {
-        const d = new Date(now); d.setDate(d.getDate() + 7 + (5 - d.getDay()));
-        return fmtDate(d);
-    }
-    // Try to find date pattern like 5月14日
     const m = text.match(/(\d{1,2})[月\/](\d{1,2})[日号]?/);
     if (m) {
         const d = new Date(now.getFullYear(), parseInt(m[1])-1, parseInt(m[2]));
@@ -614,42 +511,63 @@ function detectDate(text, now) {
     }
     return null;
 }
-
 function nextWeekday(day, now) {
     const d = new Date(now);
     const diff = day - d.getDay();
     d.setDate(d.getDate() + (diff <= 0 ? diff + 7 : diff));
     return fmtDate(d);
 }
-
 function renderResults(tasks) {
-    const titles = { work:'工作', life:'生活', health:'健康', fin:'财务' };
-    const priTitles = { urgent:'🔴 紧急', high:'🟠 高', normal:'🔵 普通', low:'⚪ 低' };
-    const items = document.getElementById('resItems');
-    items.innerHTML = tasks.map(t => `
-        <div class="res-item">
-            <div class="res-item-t">${esc(t.title)}</div>
-            <div class="res-item-m">${titles[t.cat]||'其他'} · ${priTitles[t.pri]||'普通'} ${t.deadline?'· 截止 '+t.deadline:''} ${t.delayed?'· ⚠ 已拖延':''}</div>
+    const urgent = tasks.filter(t=>t.pri==='urgent');
+    const high = tasks.filter(t=>t.pri==='high');
+    const normal = tasks.filter(t=>t.pri==='normal'||t.pri==='low');
+    const groups = [];
+    if (urgent.length) groups.push({label:'高优先级', tasks:urgent});
+    if (high.length) groups.push({label:'重要事项', tasks:high});
+    if (normal.length) groups.push({label:'其他', tasks:normal});
+    const body = document.getElementById('resBody');
+    body.innerHTML = groups.map(g => `
+        <div class="result-group slide-up">
+            <div class="result-group-label">${g.label}</div>
+            ${g.tasks.map(t => `
+                <div class="result-item">
+                    <div class="result-item-t">${esc(t.title)}</div>
+                    <div class="result-item-s">${renderSuggestion(t)}</div>
+                </div>
+            `).join('')}
         </div>
     `).join('');
-
-    // Dynamic message
-    const urgent = tasks.filter(t=>t.pri==='urgent').length;
+    const urgentCount = urgent.length;
     const delayed = tasks.filter(t=>t.delayed).length;
     const title = document.getElementById('resTitle');
     const msg = document.getElementById('resMsg');
-    if (urgent > 0) {
-        title.textContent = `发现 ${urgent} 个紧急事项`;
-        msg.textContent = '当前优先级已明确。建议优先处理紧急任务。';
+    const status = document.getElementById('resStatus');
+    if (urgentCount > 0) {
+        title.textContent = `发现 ${urgentCount} 个高优先级事项`;
+        msg.textContent = '当前优先级已明确。建议优先处理上方事项。';
+        status.textContent = '需要立即推进';
     } else if (delayed > 0) {
-        title.textContent = '事项已重新归位';
+        title.textContent = '混乱已完成整理';
         msg.textContent = `检测到 ${delayed} 个拖延事项。你的计划系统正在恢复稳定。`;
+        status.textContent = '正在恢复稳定';
     } else {
-        title.textContent = '事项已重新归位';
+        title.textContent = '今日已重新归位';
         msg.textContent = '你的计划系统正在恢复稳定。';
+        status.textContent = '节奏良好';
     }
 }
-
+function renderSuggestion(t) {
+    const suggestions = {
+        urgent: '建议：立即处理，今晚完成',
+        high: '建议：本周内完成',
+        normal: '建议：本周安排时间',
+        low: '建议：有空时处理'
+    };
+    let s = suggestions[t.pri] || suggestions.normal;
+    if (t.deadline) s += ` · 截止 ${fmtDeadline(t.deadline)}`;
+    if (t.delayed) s = '⚠ 已拖延，建议优先处理';
+    return s;
+}
 function confirmTasks() {
     if (!pendingTasks.length) return;
     const tasks = DB.tasks();
@@ -662,24 +580,64 @@ function confirmTasks() {
     document.getElementById('btnGo').disabled = true;
     navTo('pg-home');
 }
-
-// ============================
-// VOICE INPUT
-// ============================
+function renderProfile() {
+    const stats = DB.stats();
+    const tasks = DB.tasks();
+    const now = new Date();
+    const dayOfWeek = now.getDay() || 7;
+    const monday = new Date(now); monday.setDate(now.getDate() - dayOfWeek + 1);
+    document.getElementById('pStreak').textContent = stats.streak || 0;
+    const streakMsg = document.getElementById('pStreakMsg');
+    if (stats.streak >= 7) streakMsg.textContent = '连续执行一周，秩序感已经建立。继续保持这个节奏。';
+    else if (stats.streak >= 3) streakMsg.textContent = '节奏正在形成。秩序感是累积出来的。';
+    else streakMsg.textContent = '保持节奏，秩序感正在累积。';
+    const days = ['一','二','三','四','五','六','日'];
+    const weekDays = document.getElementById('pWeekDays');
+    let weekTotal = 0, weekDone = 0;
+    weekDays.innerHTML = days.map((d, i) => {
+        const date = new Date(monday); date.setDate(monday.getDate()+i);
+        const ds = fmtDate(date);
+        const dayTasks = tasks.filter(t => t.date === ds && !t.deleted);
+        const total = dayTasks.length;
+        const done = dayTasks.filter(t=>t.done).length;
+        weekTotal += total;
+        weekDone += done;
+        const pct = total ? Math.round(done/total*100) : 0;
+        const isToday = ds === todayStr();
+        return `<div class="wd">
+            <div class="wd-l">${d}</div>
+            <div class="wd-bar"><div class="wd-fill ${isToday?'today':''}" style="height:${pct}%"></div></div>
+            <div class="wd-v">${done}/${total}</div>
+        </div>`;
+    }).join('');
+    document.getElementById('pWeekTotal').textContent = weekTotal;
+    document.getElementById('pWeekDone').textContent = weekDone;
+    document.getElementById('pWeekRate').textContent = weekTotal ? Math.round(weekDone/weekTotal*100)+'%' : '0%';
+    const history = document.getElementById('pHistory');
+    const doneTasks = tasks.filter(t => t.done && !t.deleted).sort((a,b) => new Date(b.doneAt||b.createdAt) - new Date(a.doneAt||a.createdAt)).slice(0, 10);
+    if (doneTasks.length === 0) {
+        history.innerHTML = `<div class="empty"><div class="empty-emoji">📦</div><div class="empty-ttl">暂无历史记录</div><div class="empty-msg">完成任务后会在这里归档<br>每一步推进都算数</div></div>`;
+    } else {
+        history.innerHTML = doneTasks.map(t => `
+            <div class="history-item">
+                <div class="history-check">✓</div>
+                <div class="history-info">
+                    <div class="history-t">${esc(t.title)}</div>
+                    <div class="history-d">${t.doneAt ? fmtDate(new Date(t.doneAt)) : '已归档'}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
 let recognition = null;
 let isRecording = false;
-
 function toggleVoice() {
     if (isRecording) { stopVoice(); return; }
     startVoice();
 }
-
 function startVoice() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-        alert('当前浏览器不支持语音识别，请使用文字输入');
-        return;
-    }
+    if (!SR) { alert('当前浏览器不支持语音识别，请使用文字输入'); return; }
     recognition = new SR();
     recognition.lang = 'zh-CN';
     recognition.interimResults = true;
@@ -700,78 +658,33 @@ function startVoice() {
     isRecording = true;
     updateVoiceBtn();
 }
-
 function stopVoice() {
     if (recognition) { recognition.stop(); recognition = null; }
     isRecording = false;
     updateVoiceBtn();
 }
-
 function updateVoiceBtn() {
     const btn = document.getElementById('btnVoice');
     if (isRecording) {
         btn.className = 'btn btn-voice recording';
-        btn.textContent = '⏹ 停止录音';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> 停止录音';
     } else {
-        btn.className = 'btn btn-voice';
-        btn.textContent = '🎤 按住说话';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg> 按住说话';
     }
     document.getElementById('btnGo').disabled = !document.getElementById('aiInput').value.trim();
 }
-
-// Auto-enable button on text input
 document.getElementById('aiInput').addEventListener('input', function() {
     document.getElementById('btnGo').disabled = !this.value.trim();
 });
-
-// ============================
-// WEEKLY PAGE
-// ============================
-function renderWeekly() {
-    const stats = DB.stats();
-    const tasks = DB.tasks();
-    const now = new Date();
-    const dayOfWeek = now.getDay() || 7;
-    const monday = new Date(now); monday.setDate(now.getDate() - dayOfWeek + 1);
-
-    // Week days chart
-    const days = ['一','二','三','四','五','六','日'];
-    const weekDays = document.getElementById('wkDays');
-    let weekTotal = 0, weekDone = 0;
-    weekDays.innerHTML = days.map((d, i) => {
-        const date = new Date(monday); date.setDate(monday.getDate()+i);
-        const ds = fmtDate(date);
-        const done = stats.daily[ds] || 0;
-        const dayTasks = tasks.filter(t => t.date === ds && !t.deleted);
-        const total = dayTasks.length;
-        weekTotal += total;
-        weekDone += dayTasks.filter(t=>t.done).length;
-        const pct = total ? Math.round(done/total*100) : 0;
-        const isToday = ds === todayStr();
-        return `<div class="wd">
-            <div class="wd-l">${d}</div>
-            <div class="wd-bar"><div class="wd-fill ${isToday?'today':''}" style="height:${pct}%"></div></div>
-            <div class="wd-v">${done}/${total}</div>
-        </div>`;
-    }).join('');
-
-    document.getElementById('wkStreak').textContent = stats.streak || 0;
-    document.getElementById('wkTotal').textContent = weekTotal;
-    document.getElementById('wkDone').textContent = weekDone;
-    document.getElementById('wkRate').textContent = weekTotal ? Math.round(weekDone/weekTotal*100)+'%' : '0%';
-}
-
-// ============================
-// CELEBRATION
-// ============================
 const celebMsgs = [
     '你的计划系统正在恢复稳定。',
-    '当前状态：高度有序。',
+    '当前状态：恢复稳定。',
     '你的事项已经重新归位。',
     '节奏感正在回归。继续保持。',
-    '秩序感 +1，掌控感 +1。'
+    '秩序感 +1，掌控感 +1。',
+    '又推进了一步。很好。',
+    '掌控感正在累积。'
 ];
-
 function showCelebration(stats) {
     const tasks = DB.tasks();
     const today = todayStr();
@@ -779,17 +692,12 @@ function showCelebration(stats) {
     const done = todayTasks.filter(t=>t.done).length;
     const total = todayTasks.length;
     const rate = total ? Math.round(done/total*100) : 0;
-
-    document.getElementById('celTtl').textContent = '秩序值 +10';
+    document.getElementById('celTtl').textContent = '事项已推进';
     document.getElementById('celMsg').textContent = celebMsgs[Math.floor(Math.random()*celebMsgs.length)];
     document.getElementById('celN').textContent = rate + '%';
     document.getElementById('cele').classList.add('show');
     setTimeout(() => document.getElementById('cele').classList.remove('show'), 2500);
 }
-
-// ============================
-// UTILITIES
-// ============================
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtDate(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -814,25 +722,15 @@ function calcStreak(daily) {
     }
     return s;
 }
-
-// ============================
-// INIT
-// ============================
 function init() {
-    // Greeting
     const h = new Date().getHours();
     const greet = h < 12 ? '早上好' : h < 18 ? '下午好' : '晚上好';
     document.getElementById('greet').textContent = greet;
-
-    // Date
     const now = new Date();
     const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
-    document.getElementById('dateStr').textContent =
-        `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${weekdays[now.getDay()]}`;
-
+    document.getElementById('dateStr').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${weekdays[now.getDay()]}`;
     renderHome();
 }
-
 init();
 </script>
 </body>
