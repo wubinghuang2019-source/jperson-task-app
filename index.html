@@ -18,28 +18,28 @@
                     },
                     colors: {
                         primary: {
-                            50: 'hsl(220, 70%, 97%)',
-                            100: 'hsl(220, 70%, 94%)',
-                            200: 'hsl(220, 70%, 88%)',
-                            300: 'hsl(220, 70%, 78%)',
-                            400: 'hsl(220, 70%, 65%)',
-                            500: 'hsl(220, 70%, 55%)',
-                            600: 'hsl(220, 70%, 45%)',
-                            700: 'hsl(220, 70%, 35%)',
-                            800: 'hsl(220, 70%, 25%)',
-                            900: 'hsl(220, 70%, 15%)',
+                            50: 'hsl(170, 50%, 97%)',
+                            100: 'hsl(170, 50%, 93%)',
+                            200: 'hsl(170, 50%, 86%)',
+                            300: 'hsl(170, 50%, 75%)',
+                            400: 'hsl(170, 50%, 60%)',
+                            500: 'hsl(170, 50%, 45%)',
+                            600: 'hsl(170, 50%, 36%)',
+                            700: 'hsl(170, 50%, 28%)',
+                            800: 'hsl(170, 50%, 20%)',
+                            900: 'hsl(170, 50%, 12%)',
                         },
                         accent: {
-                            50: 'hsl(240, 60%, 97%)',
-                            100: 'hsl(240, 60%, 92%)',
-                            200: 'hsl(240, 60%, 84%)',
-                            300: 'hsl(240, 60%, 72%)',
-                            400: 'hsl(240, 60%, 60%)',
-                            500: 'hsl(240, 60%, 50%)',
-                            600: 'hsl(240, 60%, 42%)',
-                            700: 'hsl(240, 60%, 34%)',
-                            800: 'hsl(240, 60%, 26%)',
-                            900: 'hsl(240, 60%, 18%)',
+                            50: 'hsl(200, 55%, 97%)',
+                            100: 'hsl(200, 55%, 93%)',
+                            200: 'hsl(200, 55%, 85%)',
+                            300: 'hsl(200, 55%, 73%)',
+                            400: 'hsl(200, 55%, 58%)',
+                            500: 'hsl(200, 55%, 45%)',
+                            600: 'hsl(200, 55%, 36%)',
+                            700: 'hsl(200, 55%, 28%)',
+                            800: 'hsl(200, 55%, 20%)',
+                            900: 'hsl(200, 55%, 14%)',
                         }
                     },
                     fontSize: {
@@ -846,38 +846,13 @@
             </div>
         </div>
 
-        <!-- 底部导航 -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('home')">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">首页</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('tasks')">
-                <span class="nav-icon">📋</span>
-                <span class="nav-label">任务</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('vip')">
-                <span class="nav-icon">👑</span>
-                <span class="nav-label">VIP</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('profile')">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">我的</span>
-            </div>
-        </div>
-
-        <!-- VIP 页面返回按钮 -->
-        <button onclick="switchTab('home')" class="fixed top-6 left-6 z-50 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-gray-50 transition hidden" id="vip-back-btn">
-            ←
-        </button>
-
         <!-- 浮动添加按钮 -->
-        <button class="floating-btn" onclick="openAddModal()">+</button>
+        <button class="floating-btn" onclick="openAddModal()" id="fab-btn">+</button>
     </div>
 
     <!-- VIP 页面 -->
     <div id="vip-page" class="page">
-        <div class="p-5">
+        <div class="p-5 pb-28">
             <div class="card text-center py-16 animate-scale-in">
                 <div class="text-7xl mb-6">👑</div>
                 <h2 class="text-h2 font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-3">升级 VIP</h2>
@@ -921,6 +896,29 @@
             </div>
         </div>
     </div>
+
+    <!-- 全局底部导航（所有页面共享） -->
+    <div class="bottom-nav" id="global-bottom-nav" style="display:none;">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">首页</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tasks')">
+            <span class="nav-icon">📋</span>
+            <span class="nav-label">任务</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('vip')">
+            <span class="nav-icon">👑</span>
+            <span class="nav-label">VIP</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">我的</span>
+        </div>
+    </div>
+
+    <!-- 全局浮动添加按钮 -->
+    <button class="floating-btn" onclick="openAddModal()" id="fab-btn">+</button>
 
     <!-- 任务详情页（手帐风格） -->
     <div id="task-detail-modal" class="modal">
@@ -1134,19 +1132,26 @@
                 event.currentTarget.classList.add('active');
             }
             
-            // 显示/隐藏 VIP 返回按钮
-            const backBtn = document.getElementById('vip-back-btn');
+            const fabBtn = document.getElementById('fab-btn');
+            const mainPage = document.getElementById('main-page');
+            const vipPage = document.getElementById('vip-page');
+            
             if (tab === 'vip') {
-                backBtn.classList.remove('hidden');
-                switchPage('vip-page');
+                mainPage.classList.remove('active');
+                vipPage.classList.add('active');
+                fabBtn.style.display = 'none';
             } else if (tab === 'home') {
-                backBtn.classList.add('hidden');
-                switchPage('main-page');
+                vipPage.classList.remove('active');
+                mainPage.classList.add('active');
+                fabBtn.style.display = 'flex';
             } else if (tab === 'tasks') {
-                backBtn.classList.add('hidden');
-                switchPage('main-page');
+                vipPage.classList.remove('active');
+                mainPage.classList.add('active');
+                fabBtn.style.display = 'flex';
             } else if (tab === 'profile') {
-                backBtn.classList.add('hidden');
+                vipPage.classList.remove('active');
+                mainPage.classList.add('active');
+                fabBtn.style.display = 'none';
                 alert('个人中心功能开发中~');
             }
         }
@@ -1167,7 +1172,10 @@
             }
             
             // 模拟登录成功
-            switchPage('main-page');
+            document.getElementById('login-page').classList.remove('active');
+            document.getElementById('main-page').classList.add('active');
+            document.getElementById('global-bottom-nav').style.display = 'flex';
+            document.getElementById('fab-btn').style.display = 'flex';
         }
 
         // 发送验证码
